@@ -80,15 +80,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     <style>
       body {
         margin: 0;
-        padding: 16px;
+        padding: 8.64px;
         background: var(--vscode-editor-background);
         color: var(--vscode-editor-foreground);
         font-family: var(--vscode-font-family);
       }
       .panel {
         position: relative;
-        width: 112px;
-        height: 299px;
+        width: 60.48px;
+        height: 161.46px;
       }
       .panel-bg {
         position: absolute;
@@ -98,27 +98,27 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
       .light {
         position: absolute;
-        width: 90px;
-        height: 90px;
-        left: 11px;
+        width: 48.6px;
+        height: 48.6px;
+        left: 5.94px;
       }
       #red {
-        top: 19px;
+        top: 10.26px;
       }
       #yellow {
-        top: 104.5px;
+        top: 56.43px;
       }
       #green {
-        top: 190px;
+        top: 102.6px;
       }
       .meta {
-        margin-top: 12px;
+        margin-top: 6.48px;
         font-size: 12px;
         opacity: 0.9;
       }
       .meta strong {
         display: inline-block;
-        min-width: 52px;
+        min-width: 28.08px;
       }
     </style>
   </head>
