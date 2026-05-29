@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname } from "node:path";
+import { resolveStateFilePath } from "./bridge-paths.mjs";
 
 /** @typedef {"IDLE"|"RUNNING"|"WAITING_USER"|"WAITING_PLAN_BUILD"|"DONE"|"ERROR"} AiState */
 /** @typedef {"none"|"awaiting_selection"|"agent_replying"|"new_turn"} AskQuestionPhase */
@@ -171,7 +172,7 @@ export function isUserStillChoosingAsk({ rows, phase, sessionTurn, askLatchActiv
 }
 
 export function resolveAskLatchPath(projectRoot = process.cwd()) {
-  return resolve(projectRoot, ".ai-traffic-lights/ask-latch.json");
+  return resolveStateFilePath(projectRoot, "ask-latch.json");
 }
 
 export async function readAskLatch(projectRoot = process.cwd()) {
@@ -208,7 +209,7 @@ export function isAskLatchHoldingYellow(latch, now = Date.now()) {
 }
 
 export function resolveWatcherCursorPath(projectRoot = process.cwd()) {
-  return resolve(projectRoot, ".ai-traffic-lights/watcher-cursor.json");
+  return resolveStateFilePath(projectRoot, "watcher-cursor.json");
 }
 
 export async function readWatcherCursor(projectRoot = process.cwd()) {
@@ -323,7 +324,7 @@ export function shouldHookWriteBridge(eventName, mapped, previousState, options 
 }
 
 export function resolveSessionTurnPath(projectRoot = process.cwd()) {
-  return resolve(projectRoot, ".ai-traffic-lights/session-turn.json");
+  return resolveStateFilePath(projectRoot, "session-turn.json");
 }
 
 export async function readSessionTurn(projectRoot = process.cwd()) {

@@ -27,6 +27,9 @@
     "sync:install-kits": "bash tools/sync-install-kits.sh",
     "prepare:cursor-extension": "npm run build -w @traffic-lights/protocol && npm run build -w @traffic-lights/core && npm run build -w ai-traffic-lights-cursor-extension",
     "install:cursor-extension:local": "bash tools/install-cursor-extension-local.sh",
+    "install:global-hooks": "bash tools/install-global-hooks.sh",
+    "uninstall:global-hooks": "bash tools/uninstall-global-hooks.sh",
+    "uninstall:cursor-extension": "bash tools/uninstall-cursor-extension.sh",
     "bootstrap": "bash tools/bootstrap-traffic-lights.sh",
     "package:extension": "npm run build -w ai-traffic-lights-cursor-extension && npm run package -w ai-traffic-lights-cursor-extension"
   },

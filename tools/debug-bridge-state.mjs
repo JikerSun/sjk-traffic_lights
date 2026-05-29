@@ -2,11 +2,18 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import {
+  resolveBridgePath,
+  resolveOverlayBridgePath,
+  shouldMirrorOverlayBridge,
+  getWorkspaceStateDir
+} from "../scripts/lib/bridge-paths.mjs";
 
 const ROOT = resolve(process.cwd());
-const BRIDGE_PATH = resolve(ROOT, ".ai-traffic-lights/state.json");
-const OVERLAY_BRIDGE_PATH = resolve(ROOT, "products/desktop-overlay/public/.ai-traffic-lights/state.json");
-const INDEX_PATH = resolve(ROOT, ".ai-traffic-lights/debug-index.json");
+const BRIDGE_PATH = resolveBridgePath(ROOT);
+const OVERLAY_BRIDGE_PATH = resolveOverlayBridgePath(ROOT);
+const MIRROR_OVERLAY = shouldMirrorOverlayBridge(ROOT);
+const INDEX_PATH = resolve(getWorkspaceStateDir(ROOT), "debug-index.json");
 
 const VALID_STATES = new Set([
   "IDLE",
@@ -25,7 +32,9 @@ const STEPS = [
 
 async function ensurePaths() {
   await mkdir(dirname(BRIDGE_PATH), { recursive: true });
-  await mkdir(dirname(OVERLAY_BRIDGE_PATH), { recursive: true });
+  if (MIRROR_OVERLAY) {
+    await mkdir(dirname(OVERLAY_BRIDGE_PATH), { recursive: true });
+  }
 }
 
 async function readIndex() {
@@ -53,9 +62,11 @@ async function writeState({ state, reason, source = "debug-script", tool = "curs
   };
   const body = JSON.stringify(payload, null, 2);
   await writeFile(BRIDGE_PATH, body, "utf8");
-  await writeFile(OVERLAY_BRIDGE_PATH, body, "utf8");
   console.log(`Wrote ${payload.state} -> ${BRIDGE_PATH}`);
-  console.log(`Mirrored ${payload.state} -> ${OVERLAY_BRIDGE_PATH}`);
+  if (MIRROR_OVERLAY) {
+    await writeFile(OVERLAY_BRIDGE_PATH, body, "utf8");
+    console.log(`Mirrored ${payload.state} -> ${OVERLAY_BRIDGE_PATH}`);
+  }
   console.log(`Reason: ${payload.reason}`);
 }
 

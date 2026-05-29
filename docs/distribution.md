@@ -5,18 +5,41 @@
 | 层级 | 装几次 | 作用 |
 |------|--------|------|
 | **A. Cursor 扩展** | 每台电脑 **1 次** | 侧边栏三盏灯（读 `state.json`） |
-| **B. 项目 Hooks** | **每个仓库 1 次** | Agent 运行时自动写 `state.json` |
+| **B. 全局 Hooks（推荐）** | 每台电脑 **1 次** | 所有打开的项目自动写状态 |
+| ~~B. 每项目 Hooks~~ | 已过时 | 仅在不装全局时作备用 |
 
 只装 A 不装 B → 灯不会随 AI 自动变。  
-只装 B 不装 A → 可以改 `state.json`，但没有侧边栏 UI。
+只装 B 不装 A → 可以改状态文件，但没有侧边栏 UI。
 
 **不想翻源码：** 从仓库 [`install/`](../install/) 进入对应子目录即可。
 
 ---
 
+## 推荐：一次装全局（所有文件夹生效）
+
+```bash
+git clone https://github.com/JikerSun/sjk-traffic_lights.git
+cd sjk-traffic_lights
+npm install
+npm run install:global-hooks
+npm run install:cursor-extension:local
+```
+
+或：构建 VSIX 后安装 [`install/cursor/extension/`](../install/cursor/extension/) 里的包。
+
+然后 **Reload Window**。用 Cursor 打开**任意项目根目录**，跑 Agent 后侧边栏灯会随状态变化。
+
+状态文件（按工作区隔离，不污染业务仓库）：
+
+`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+
+详见 [`install/cursor/global-hooks/README.md`](../install/cursor/global-hooks/README.md)。
+
+---
+
 ## A. 扩展（本机一次）
 
-### 方式 1：从 GitHub Release 装 VSIX（推荐给同事）
+### 方式 1：从 GitHub Release 装 VSIX
 
 1. 在 [Releases](https://github.com/JikerSun/sjk-traffic_lights/releases) 下载 `ai-traffic-lights-cursor.vsix`
 2. Cursor → `Cmd+Shift+P` → **Extensions: Install from VSIX...**
@@ -25,13 +48,10 @@
 ### 方式 2：从源码构建 VSIX
 
 ```bash
-git clone https://github.com/JikerSun/sjk-traffic_lights.git
-cd sjk-traffic_lights
-npm install
 npm run package:extension
 ```
 
-安装 **`install/cursor/extension/ai-traffic-lights-cursor.vsix`**（步骤同方式 1）。
+安装 **`install/cursor/extension/ai-traffic-lights-cursor.vsix`**。
 
 ### 方式 3：本地开发安装
 
@@ -39,64 +59,101 @@ npm run package:extension
 npm run install:cursor-extension:local
 ```
 
-然后 Reload Window。
+---
+
+## B. 全局 Hooks（本机一次，推荐）
+
+```bash
+npm run install:global-hooks
+```
+
+会：
+
+- 安装脚本到 `~/.cursor/ai-traffic-lights/`
+- 合并 `~/.cursor/hooks.json`（安装前自动备份）
+- 每个 Cursor 工作区使用独立 `state.json`（不会 A 项目 Agent 改掉 B 项目的灯）
+
+若某项目里曾经 `bootstrap` 过，全局安装后**项目内 Hook 会自动跳过**，避免重复执行、双倍性能消耗。
 
 ---
 
-## B. 项目 Hooks（每个仓库一次，约 5 秒）
+## B2. 备用：仅单个项目 Hooks（不推荐）
 
-### 方式 1：只下载 Hooks 文件夹
-
-使用仓库中的 **`install/cursor/workspace-hooks/`**（可单独拷贝或 sparse checkout）：
+仅在不方便写用户目录时使用：
 
 ```bash
 install/cursor/workspace-hooks/bootstrap.sh /path/to/your-project
 ```
 
-### 方式 2：从完整仓库 bootstrap
+或 `npm run bootstrap -- /path/to/your-project`。
+
+---
+
+## 卸载（彻底）
+
+按顺序执行，避免残留：
+
+### 1. 卸全局 Hooks 与桥接数据
 
 ```bash
-git clone https://github.com/JikerSun/sjk-traffic_lights.git
-/path/to/sjk-traffic_lights/tools/bootstrap-traffic-lights.sh /path/to/your-project
+npm run uninstall:global-hooks
 ```
 
-或在工具仓库根目录：
+删除：
+
+- `~/.cursor/ai-traffic-lights/`（含各工作区 `states/`）
+- `~/.cursor/hooks.json` 中本工具相关条目（合并前若有备份在 `hooks.json.bak.ai-traffic-lights.*`）
+
+### 2. 卸 Cursor 扩展
 
 ```bash
-npm run bootstrap -- /path/to/your-project
+npm run uninstall:cursor-extension
 ```
 
-会复制到目标项目：
+或在 Cursor：**Extensions → AI Traffic Lights → Uninstall**。
 
-- `.cursor/hooks.json`
+### 3. 可选：清理曾 bootstrap 过的业务仓库
+
+在每个项目根目录删除（若存在）：
+
+- `.cursor/hooks.json` 里 traffic-lights 相关 command
 - `.cursor/hooks/write-bridge-from-hook.mjs`
-- `scripts/lib/*.mjs`
-- `.ai-traffic-lights/state.json`（若不存在则创建）
+- `scripts/lib/` 下 bridge 相关 `.mjs`
+- `.ai-traffic-lights/`（运行时目录）
 
-修改本仓库 hooks 后，请执行 `npm run sync:install-kits` 以更新 `install/cursor/workspace-hooks/`。
+最后 **Reload Window**。
 
-然后用 **Cursor 打开目标项目根目录** → **Reload Window** → **Status Lights**。
+**说明：** 无后台常驻进程；卸载后不会占用 CPU/内存。未删除的 `state.json` 只是磁盘上的小 JSON 文件，不是内存泄漏。
 
 ---
 
 ## 快速检查清单
 
 - [ ] 扩展已安装（命令面板能搜到 `AI Traffic Lights`）
-- [ ] 当前窗口打开的是 **已 bootstrap 的那个文件夹**
+- [ ] 已执行 `npm run install:global-hooks`（或确认 `~/.cursor/hooks.json` 含本工具）
+- [ ] 当前窗口打开的是**项目根目录**
 - [ ] 已 Reload Window
-- [ ] Agent 跑一轮后 `.ai-traffic-lights/state.json` 里 `state` 会变（如 `RUNNING` → `DONE`）
+- [ ] Agent 跑一轮后，`~/.cursor/ai-traffic-lights/states/.../state.json` 中 `state` 会变
 
 手动试灯：`Cmd+Shift+P` → `AI Traffic Lights: Set Running` / `Set Done`
 
 ---
 
+## 性能说明
+
+- Hook 仅在 Cursor 触发 Agent 事件时启动 **Node 子进程**，无 Agent 时 **零占用**。
+- 扩展仅 **监听当前工作区** 对应的一个 `state.json`，无轮询、无额外 watcher 进程。
+- 全局 + 项目双 Hook 已通过「全局已装则项目 Hook 立即退出」避免双倍执行。
+
+---
+
 ## 已知能力边界
 
-见 [`traffic-lights-runtime.md`](traffic-lights-runtime.md)：黄灯（AskQuestion）、Plan 等 Build 红黄闪依赖 Cursor 信号，当前以 **红 / 绿 / ERROR** 为主。
+见 [`traffic-lights-runtime.md`](traffic-lights-runtime.md)。
 
 ---
 
 ## 安全说明
 
-- **不要**把 GitHub 密码交给他人或 AI。
-- 用 [GitHub CLI](https://cli.github.com/) `gh auth login`，或 **SSH / Personal Access Token** 推送代码。
+- 状态文件仅在 `~/.cursor/ai-traffic-lights/states/` 下，按工作区 hash 分子目录，不写入随意路径。
+- 不要把 GitHub 密码交给他人或 AI；推送用 SSH / `gh auth login`。

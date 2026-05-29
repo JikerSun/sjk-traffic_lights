@@ -1,8 +1,14 @@
 # Cursor 安装
 
-两层安装（缺一不可才能「自动变灯」）：
+## 推荐流程（所有项目生效）
 
-1. **扩展（本机一次）** → [extension/](extension/)
-2. **项目 Hooks（每个仓库一次）** → [workspace-hooks/](workspace-hooks/)
+1. **全局 Hooks（本机一次）** → [global-hooks/](global-hooks/)  
+   `npm run install:global-hooks`
+2. **扩展（本机一次）** → [extension/](extension/)  
+   VSIX 或 `npm run install:cursor-extension:local`
 
-安装后：用 Cursor 打开已 bootstrap 的项目根目录 → **Reload Window** → 视图 **Status Lights**。
+Reload Window 后，打开任意项目根目录即可。
+
+## 备用：仅一个项目
+
+[workspace-hooks/bootstrap.sh](workspace-hooks/bootstrap.sh) — 无需全局安装时使用。

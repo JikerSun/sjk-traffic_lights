@@ -10,8 +10,8 @@ flowchart LR
     Hooks[hooks.json]
     Agent[Agent / Plan UI]
   end
-  subgraph bridge [Workspace bridge]
-    State[state.json]
+  subgraph bridge [Bridge per workspace]
+    State["~/.cursor/ai-traffic-lights/states/id/state.json"]
     Session[session-turn.json]
     Active[active-session.json]
   end
@@ -29,7 +29,8 @@ flowchart LR
 
 | Piece | Path | Role |
 |-------|------|------|
-| Hook entry | [`.cursor/hooks/write-bridge-from-hook.mjs`](../.cursor/hooks/write-bridge-from-hook.mjs) | Map Cursor events → `state.json` |
+| Hook entry | `~/.cursor/ai-traffic-lights/hooks/write-bridge-from-hook.mjs` (global) or project `.cursor/hooks/` | Map Cursor events → state file |
+| Path layout | [`scripts/lib/bridge-paths.mjs`](../scripts/lib/bridge-paths.mjs) | Per-workspace dir under `~/.cursor/ai-traffic-lights/states/` |
 | State rules | [`scripts/lib/bridge-resolve.mjs`](../scripts/lib/bridge-resolve.mjs) | Single mapping table |
 | Ask / transcript | [`scripts/lib/cursor-transcript-state.mjs`](../scripts/lib/cursor-transcript-state.mjs) | AskQuestion phase, latch |
 | Plan session | [`scripts/lib/plan-session.mjs`](../scripts/lib/plan-session.mjs) | `plan.awaitingBuild`, CreatePlan, `.plan.md` |

@@ -12,11 +12,18 @@ import {
 } from "../scripts/lib/cursor-transcript-state.mjs";
 import { normalizePlanContext } from "../scripts/lib/plan-session.mjs";
 import { resolveBridgeState } from "../scripts/lib/bridge-resolve.mjs";
+import {
+  resolveBridgePath,
+  resolveActiveSessionPath,
+  resolveOverlayBridgePath,
+  shouldMirrorOverlayBridge
+} from "../scripts/lib/bridge-paths.mjs";
 
 const root = process.cwd();
-const activeSessionPath = resolve(root, ".ai-traffic-lights/active-session.json");
-const bridgePath = resolve(root, ".ai-traffic-lights/state.json");
-const overlayBridgePath = resolve(root, "products/desktop-overlay/public/.ai-traffic-lights/state.json");
+const activeSessionPath = resolveActiveSessionPath(root);
+const bridgePath = resolveBridgePath(root);
+const overlayBridgePath = resolveOverlayBridgePath(root);
+const mirrorOverlay = shouldMirrorOverlayBridge(root);
 
 const once = process.argv.includes("--once");
 const verbose = process.argv.includes("--verbose");
@@ -72,9 +79,11 @@ async function writeBridgeState(state, reason, source, sessionId) {
   };
   const body = JSON.stringify(payload, null, 2);
   await mkdir(dirname(bridgePath), { recursive: true });
-  await mkdir(dirname(overlayBridgePath), { recursive: true });
   await writeFile(bridgePath, body, "utf8");
-  await writeFile(overlayBridgePath, body, "utf8");
+  if (mirrorOverlay) {
+    await mkdir(dirname(overlayBridgePath), { recursive: true });
+    await writeFile(overlayBridgePath, body, "utf8");
+  }
 
   if (verbose) {
     process.stdout.write(`[watcher] -> ${state}\n`);

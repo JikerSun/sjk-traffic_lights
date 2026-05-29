@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
+import { existsSync } from "node:fs";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   readTranscriptRows,
   getAskQuestionPhase,
@@ -30,14 +33,35 @@ import {
   findRecentPlanArtifact
 } from "../../scripts/lib/plan-session.mjs";
 import { resolveBridgeState, shouldHookWriteBridge } from "../../scripts/lib/bridge-resolve.mjs";
+import {
+  resolveBridgePath,
+  resolveActiveSessionPath,
+  resolveOverlayBridgePath,
+  shouldMirrorOverlayBridge,
+  getWorkspaceStateId
+} from "../../scripts/lib/bridge-paths.mjs";
 
 const DEBUG = process.env.TRAFFIC_LIGHTS_DEBUG === "1";
 const eventName = process.argv[2] || "unknown";
 const cwd = process.cwd();
 
-const bridgePath = resolve(cwd, ".ai-traffic-lights/state.json");
-const overlayBridgePath = resolve(cwd, "products/desktop-overlay/public/.ai-traffic-lights/state.json");
-const activeSessionPath = resolve(cwd, ".ai-traffic-lights/active-session.json");
+const GLOBAL_ROOT = resolve(homedir(), ".cursor", "ai-traffic-lights");
+const GLOBAL_MANIFEST = resolve(GLOBAL_ROOT, "install-manifest.json");
+const THIS_HOOK_FILE = fileURLToPath(import.meta.url);
+const IS_GLOBAL_HOOK_INSTALL = THIS_HOOK_FILE.startsWith(resolve(GLOBAL_ROOT, "hooks"));
+
+if (existsSync(GLOBAL_MANIFEST) && !IS_GLOBAL_HOOK_INSTALL) {
+  if (eventName === "beforeSubmitPrompt") {
+    process.stdout.write(JSON.stringify({ continue: true }));
+  }
+  process.exit(0);
+}
+
+const bridgePath = resolveBridgePath(cwd);
+const overlayBridgePath = resolveOverlayBridgePath(cwd);
+const mirrorOverlay = shouldMirrorOverlayBridge(cwd);
+const activeSessionPath = resolveActiveSessionPath(cwd);
+const workspaceStateId = getWorkspaceStateId(cwd);
 
 async function readStdin() {
   return new Promise((resolveInput) => {
@@ -78,11 +102,17 @@ async function readHookPayload() {
 }
 
 async function writeBridge(payload) {
-  const body = JSON.stringify(payload, null, 2);
+  const body = JSON.stringify(
+    { ...payload, workspaceStateId, workspaceRoot: cwd },
+    null,
+    2
+  );
   await mkdir(dirname(bridgePath), { recursive: true });
-  await mkdir(dirname(overlayBridgePath), { recursive: true });
   await writeFile(bridgePath, body, "utf8");
-  await writeFile(overlayBridgePath, body, "utf8");
+  if (mirrorOverlay) {
+    await mkdir(dirname(overlayBridgePath), { recursive: true });
+    await writeFile(overlayBridgePath, body, "utf8");
+  }
 }
 
 async function getPreviousState() {

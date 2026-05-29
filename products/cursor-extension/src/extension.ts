@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
+import { watch as fsWatch } from "node:fs";
 import { TrafficLightEngine, type AiState, type StateEvent } from "./trafficLightCore.js";
 import { SidebarProvider } from "./sidebarProvider.js";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import { resolveBridgeFilePath } from "./bridgePaths.js";
 
 const engine = new TrafficLightEngine({ blinkIntervalMs: 700 });
-const BRIDGE_DIR = ".ai-traffic-lights";
-const BRIDGE_FILE = "state.json";
 
 const VALID_STATES: ReadonlySet<AiState> = new Set([
   "IDLE",
@@ -17,17 +17,20 @@ const VALID_STATES: ReadonlySet<AiState> = new Set([
   "ERROR"
 ]);
 
+const bridgeWatcherDispose = { dispose: (): void => undefined };
+
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new SidebarProvider(context, engine);
-  const bridgeUri = getBridgeUri();
 
-  if (bridgeUri) {
-    watchBridgeFile(context, bridgeUri);
-    void ensureBridgeFile(bridgeUri).then(() => void applyBridgeFile(bridgeUri));
-  }
+  context.subscriptions.push({
+    dispose: () => bridgeWatcherDispose.dispose()
+  });
+
+  rebindBridgeWatcher();
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider("aiTrafficLights.sidebar", provider),
+    vscode.workspace.onDidChangeWorkspaceFolders(() => rebindBridgeWatcher()),
     vscode.commands.registerCommand("aiTrafficLights.showStatusLights", async () => {
       await vscode.commands.executeCommand("workbench.view.explorer");
       await vscode.commands.executeCommand("aiTrafficLights.sidebar.focus");
@@ -63,34 +66,40 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 }
 
-export function deactivate(): void {}
-
-function getBridgeUri(): vscode.Uri | undefined {
-  const root = vscode.workspace.workspaceFolders?.[0]?.uri;
-  return root ? vscode.Uri.joinPath(root, BRIDGE_DIR, BRIDGE_FILE) : undefined;
+export function deactivate(): void {
+  bridgeWatcherDispose.dispose();
 }
 
-function watchBridgeFile(context: vscode.ExtensionContext, bridgeUri: vscode.Uri): void {
-  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!workspaceRoot) {
+function rebindBridgeWatcher(): void {
+  bridgeWatcherDispose.dispose();
+
+  const uri = getBridgeUri();
+  if (!uri) {
+    bridgeWatcherDispose.dispose = (): void => undefined;
     return;
   }
-  const watcher = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(workspaceRoot, `${BRIDGE_DIR}/${BRIDGE_FILE}`)
-  );
-  context.subscriptions.push(watcher);
 
-  const refresh = async (changedUri: vscode.Uri): Promise<void> => {
-    if (changedUri.fsPath !== bridgeUri.fsPath) {
-      return;
-    }
-    await applyBridgeFile(bridgeUri);
+  const refresh = async (): Promise<void> => {
+    await applyBridgeFile(uri);
   };
 
-  context.subscriptions.push(
-    watcher.onDidCreate((uri) => void refresh(uri)),
-    watcher.onDidChange((uri) => void refresh(uri))
-  );
+  const nodeWatcher = fsWatch(uri.fsPath, { persistent: false }, () => {
+    void refresh();
+  });
+
+  bridgeWatcherDispose.dispose = () => {
+    nodeWatcher.close();
+  };
+
+  void ensureBridgeFile(uri).then(() => void applyBridgeFile(uri));
+}
+
+function getBridgeUri(): vscode.Uri | undefined {
+  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (!root) {
+    return undefined;
+  }
+  return vscode.Uri.file(resolveBridgeFilePath(root));
 }
 
 async function ensureBridgeFile(uri: vscode.Uri): Promise<void> {
