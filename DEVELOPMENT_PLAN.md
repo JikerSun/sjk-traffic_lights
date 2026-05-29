@@ -341,11 +341,12 @@ Feedback sent via **Help → Send Feedback** (Bug) describing the above.
 
 ## 11) Handoff Notes For Next Session
 
-- **Canonical runtime doc:** [`docs/traffic-lights-runtime.md`](docs/traffic-lights-runtime.md) (logic, limits, performance v4.7).
+- **Start here:** [`docs/HANDOFF.md`](docs/HANDOFF.md) — progress, architecture, global hooks, install/uninstall, open tasks (updated 2026-05-29).
+- **Runtime detail:** [`docs/traffic-lights-runtime.md`](docs/traffic-lights-runtime.md) (logic, limits, performance v4.7).
 - **Ship without reliable yellow / Plan-wait**; see §9 and runtime doc.
-- **v4.7:** Slim `hooks.json` (no duplicate matchers, no thought/MCP hooks), extension only watches `state.json` (no watcher spawn, no 250ms poll), local `*.log` removed.
-- Do not add yellow/plan heuristics without new Cursor signals.
-- **Next product work:** desktop overlay test first, then Codex adapter (see runtime doc).
+- **Global hooks (2026-05-29):** `npm run install:global-hooks`; state under `~/.cursor/ai-traffic-lights/states/<id>/`; must use `workspace_roots[0]` in hook (not `process.cwd()`).
+- Do not add yellow/plan heuristics without new Cursor signals unless user says **「修 Plan 灯」**.
+- **Next product work:** verify global hook fix → desktop overlay → Plan/Codex when requested.
 
 ### 2026-05-29 v4.7 — performance & docs cleanup
 

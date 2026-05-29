@@ -107,6 +107,7 @@ npm run install:cursor-extension:local
 
 | 文档 | 内容 |
 |------|------|
+| **[docs/HANDOFF.md](docs/HANDOFF.md)** | **接续必读：进度、总体逻辑、待办、已知 Bug** |
 | [docs/distribution.md](docs/distribution.md) | 安装、卸载、性能 |
 | [docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md) | 运行时逻辑 |
 | [docs/architecture.md](docs/architecture.md) | 架构 |

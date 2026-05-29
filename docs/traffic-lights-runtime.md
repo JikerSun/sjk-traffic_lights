@@ -1,6 +1,6 @@
 # AI Traffic Lights — Runtime Logic & Known Limits
 
-Reference for later iteration. **Do not** rely on local `*.log` files under `.ai-traffic-lights/` (removed); use `state.json` + optional `TRAFFIC_LIGHTS_DEBUG=1` stderr from hooks.
+Reference for later iteration. **Quick continue:** [`HANDOFF.md`](HANDOFF.md). **Do not** rely on local `*.log` files under `.ai-traffic-lights/` (removed); use `state.json` + optional `TRAFFIC_LIGHTS_DEBUG=1` stderr from hooks.
 
 ## Architecture
 
