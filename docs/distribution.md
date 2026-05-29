@@ -70,7 +70,7 @@ npm run install:global-hooks
 会：
 
 - 安装脚本到 `~/.cursor/ai-traffic-lights/`
-- 合并 `~/.cursor/hooks.json`（安装前自动备份）
+- 合并 `~/.cursor/hooks.json`（命令路径相对 `~/.cursor/`，安装前自动备份）
 - 每个 Cursor 工作区使用独立 `state.json`（不会 A 项目 Agent 改掉 B 项目的灯）
 
 若某项目里曾经 `bootstrap` 过，全局安装后**项目内 Hook 会自动跳过**，避免重复执行、双倍性能消耗。

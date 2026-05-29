@@ -38,12 +38,12 @@ import {
   resolveActiveSessionPath,
   resolveOverlayBridgePath,
   shouldMirrorOverlayBridge,
-  getWorkspaceStateId
+  getWorkspaceStateId,
+  resolveProjectRootFromHook
 } from "../../scripts/lib/bridge-paths.mjs";
 
 const DEBUG = process.env.TRAFFIC_LIGHTS_DEBUG === "1";
 const eventName = process.argv[2] || "unknown";
-const cwd = process.cwd();
 
 const GLOBAL_ROOT = resolve(homedir(), ".cursor", "ai-traffic-lights");
 const GLOBAL_MANIFEST = resolve(GLOBAL_ROOT, "install-manifest.json");
@@ -57,11 +57,21 @@ if (existsSync(GLOBAL_MANIFEST) && !IS_GLOBAL_HOOK_INSTALL) {
   process.exit(0);
 }
 
-const bridgePath = resolveBridgePath(cwd);
-const overlayBridgePath = resolveOverlayBridgePath(cwd);
-const mirrorOverlay = shouldMirrorOverlayBridge(cwd);
-const activeSessionPath = resolveActiveSessionPath(cwd);
-const workspaceStateId = getWorkspaceStateId(cwd);
+let projectRoot = process.cwd();
+let bridgePath = resolveBridgePath(projectRoot);
+let overlayBridgePath = resolveOverlayBridgePath(projectRoot);
+let mirrorOverlay = shouldMirrorOverlayBridge(projectRoot);
+let activeSessionPath = resolveActiveSessionPath(projectRoot);
+let workspaceStateId = getWorkspaceStateId(projectRoot);
+
+function configureProjectRoot(root) {
+  projectRoot = resolve(root);
+  bridgePath = resolveBridgePath(projectRoot);
+  overlayBridgePath = resolveOverlayBridgePath(projectRoot);
+  mirrorOverlay = shouldMirrorOverlayBridge(projectRoot);
+  activeSessionPath = resolveActiveSessionPath(projectRoot);
+  workspaceStateId = getWorkspaceStateId(projectRoot);
+}
 
 async function readStdin() {
   return new Promise((resolveInput) => {
@@ -103,7 +113,7 @@ async function readHookPayload() {
 
 async function writeBridge(payload) {
   const body = JSON.stringify(
-    { ...payload, workspaceStateId, workspaceRoot: cwd },
+    { ...payload, workspaceStateId, workspaceRoot: projectRoot },
     null,
     2
   );
@@ -270,6 +280,7 @@ const TRANSCRIPT_EVENTS = new Set([
 
 async function main() {
   const hookPayload = await readHookPayload();
+  configureProjectRoot(resolveProjectRootFromHook(hookPayload, process.cwd()));
   const transcriptPath = hookPayload?.transcript_path || null;
   const conversationId = hookPayload?.conversation_id || hookPayload?.session_id || null;
   const rows =
@@ -277,17 +288,17 @@ async function main() {
   const phase = getAskQuestionPhase(rows);
   const toolName = getToolName(hookPayload);
 
-  let sessionTurn = await readSessionTurn(cwd);
+  let sessionTurn = await readSessionTurn(projectRoot);
   let plan = normalizePlanContext(sessionTurn?.plan);
   plan = await updatePlanFromHook(hookPayload, plan, sessionTurn);
 
   const askIdx = findLastAskQuestionIdx(rows);
-  let askLatch = await readAskLatch(cwd);
+  let askLatch = await readAskLatch(projectRoot);
   const latchOk = askLatch?.conversationId && conversationId && askLatch.conversationId === conversationId;
   let askLatchActive = isAskLatchHoldingYellow(latchOk ? askLatch : null);
 
   if (eventName === "beforeSubmitPrompt") {
-    await clearAskLatch(cwd);
+    await clearAskLatch(projectRoot);
     askLatchActive = false;
     plan = normalizePlanContext(null);
     const now = Date.now();
@@ -301,9 +312,9 @@ async function main() {
       askPending: false,
       plan
     };
-    await writeSessionTurn(cwd, sessionTurn);
+    await writeSessionTurn(projectRoot, sessionTurn);
     if (conversationId) {
-      await writeWatcherCursor(cwd, { conversationId, lastAskIdx: askIdx, initialized: true, ts: now });
+      await writeWatcherCursor(projectRoot, { conversationId, lastAskIdx: askIdx, initialized: true, ts: now });
     }
     await writeBridge({
       tool: "cursor",
@@ -319,8 +330,8 @@ async function main() {
   }
 
   if (eventName === "sessionEnd") {
-    await clearAskLatch(cwd);
-    await clearSessionTurn(cwd);
+    await clearAskLatch(projectRoot);
+    await clearSessionTurn(projectRoot);
     const mapped = resolveBridgeState({ eventName, payload: hookPayload, rows, sessionTurn, plan, toolName, phase });
     await writeBridge({
       tool: "cursor",
@@ -336,7 +347,7 @@ async function main() {
   if (conversationId && askIdx >= 0 && phase === "awaiting_selection" && isAskQuestionUnresolved(rows)) {
     const isNewAsk = !latchOk || Number(askLatch?.askIdx) < askIdx;
     if (isNewAsk) {
-      await writeAskLatch(cwd, {
+      await writeAskLatch(projectRoot, {
         conversationId,
         askIdx,
         minHoldUntil: Date.now() + 1500,
@@ -348,10 +359,10 @@ async function main() {
 
   const askPending = syncAskPending(sessionTurn, { toolName, phase, rows, eventName, payload: hookPayload });
   if (!askPending) {
-    await clearAskLatch(cwd);
+    await clearAskLatch(projectRoot);
     askLatchActive = false;
   } else if (isAskQuestionUnresolved(rows) === false) {
-    await clearAskLatch(cwd);
+    await clearAskLatch(projectRoot);
     askLatchActive = false;
   }
 
@@ -363,15 +374,15 @@ async function main() {
       lastHookAt: Date.now(),
       lastHookEvent: eventName
     };
-    await writeSessionTurn(cwd, sessionTurn);
+    await writeSessionTurn(projectRoot, sessionTurn);
   }
 
   if (eventName === "stop" && hookPayload?.status === "completed" && !isAskQuestionUnresolved(rows)) {
     if (!plan.awaitingBuild || plan.buildStarted) {
-      await clearAskLatch(cwd);
+      await clearAskLatch(projectRoot);
     }
     if (!plan.awaitingBuild) {
-      await clearSessionTurn(cwd);
+      await clearSessionTurn(projectRoot);
     }
   }
 
@@ -402,7 +413,7 @@ async function main() {
     eventName !== "beforeSubmitPrompt"
   ) {
     sessionTurn = { ...sessionTurn, askPending: true };
-    await writeSessionTurn(cwd, sessionTurn);
+    await writeSessionTurn(projectRoot, sessionTurn);
     mapped = {
       state: "WAITING_USER",
       reason: transcriptMapped.reason,

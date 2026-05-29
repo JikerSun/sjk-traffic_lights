@@ -37,12 +37,13 @@ async function readJson(path, fallback) {
   }
 }
 
-function buildHookCommands(hookScriptPath) {
+function buildHookCommands() {
   const node = process.execPath;
+  const hookScript = "./ai-traffic-lights/hooks/write-bridge-from-hook.mjs";
   return Object.fromEntries(
     HOOK_EVENTS.map((eventName) => [
       eventName,
-      [{ command: `${node} ${hookScriptPath} ${eventName}` }]
+      [{ command: `${node} ${hookScript} ${eventName}` }]
     ])
   );
 }
@@ -106,7 +107,7 @@ export async function installGlobalHooks() {
   }
 
   const existing = await readJson(USER_HOOKS_JSON, { version: 1, hooks: {} });
-  const ours = buildHookCommands(hookScriptPath);
+  const ours = buildHookCommands();
   const merged = mergeOurHooks(existing, ours);
   await writeFile(USER_HOOKS_JSON, `${JSON.stringify(merged, null, 2)}\n`, "utf8");
 
