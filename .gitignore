@@ -1,0 +1,18 @@
+node_modules
+dist
+.DS_Store
+.vscode-test
+*.vsix
+coverage
+
+# Runtime bridge artifacts (per-machine / per-session)
+.ai-traffic-lights/*.log
+.ai-traffic-lights/recon-*.json
+.ai-traffic-lights/state-debug.json
+.ai-traffic-lights/watcher-state.json
+.ai-traffic-lights/debug-index.json
+.ai-traffic-lights/state.json
+.ai-traffic-lights/session-turn.json
+.ai-traffic-lights/active-session.json
+.ai-traffic-lights/ask-latch.json
+.ai-traffic-lights/watcher-cursor.json

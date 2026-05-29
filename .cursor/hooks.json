@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs beforeSubmitPrompt"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs preToolUse"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs postToolUse"
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs postToolUseFailure"
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs afterAgentResponse"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs afterFileEdit"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs stop"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": ".cursor/hooks/write-bridge-from-hook.mjs sessionEnd"
+      }
+    ]
+  }
+}

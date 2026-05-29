@@ -1,0 +1,82 @@
+{
+  "name": "ai-traffic-lights-cursor-extension",
+  "displayName": "AI Traffic Lights",
+  "version": "0.1.3",
+  "publisher": "local",
+  "description": "Traffic light status indicator for AI workflow in Cursor.",
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onView:aiTrafficLights.sidebar",
+    "onStartupFinished",
+    "onCommand:aiTrafficLights.setRunning",
+    "onCommand:aiTrafficLights.setWaiting",
+    "onCommand:aiTrafficLights.setDone",
+    "onCommand:aiTrafficLights.setIdle",
+    "onCommand:aiTrafficLights.setPlanWaiting",
+    "onCommand:aiTrafficLights.setError",
+    "onCommand:aiTrafficLights.openBridgeFile",
+    "onCommand:aiTrafficLights.showStatusLights"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "aiTrafficLights.sidebar",
+          "name": "Status Lights",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "aiTrafficLights.setRunning",
+        "title": "AI Traffic Lights: Set Running"
+      },
+      {
+        "command": "aiTrafficLights.setWaiting",
+        "title": "AI Traffic Lights: Set Waiting User"
+      },
+      {
+        "command": "aiTrafficLights.setDone",
+        "title": "AI Traffic Lights: Set Done"
+      },
+      {
+        "command": "aiTrafficLights.setIdle",
+        "title": "AI Traffic Lights: Set Idle"
+      },
+      {
+        "command": "aiTrafficLights.setPlanWaiting",
+        "title": "AI Traffic Lights: Set Plan Waiting (Build)"
+      },
+      {
+        "command": "aiTrafficLights.setError",
+        "title": "AI Traffic Lights: Set Error"
+      },
+      {
+        "command": "aiTrafficLights.openBridgeFile",
+        "title": "AI Traffic Lights: Open Bridge State File"
+      },
+      {
+        "command": "aiTrafficLights.showStatusLights",
+        "title": "AI Traffic Lights: Show Status Lights"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "package": "vsce package --out ai-traffic-lights-cursor.vsix --allow-missing-repository --skip-license --allow-package-all-secrets"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@vscode/vsce": "^3.9.1",
+    "@types/node": "^20.14.9",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  }
+}
