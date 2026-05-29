@@ -5,12 +5,12 @@
 The project uses a shared-core architecture:
 
 - UI shells:
-  - `apps/cursor-extension`
-  - `apps/desktop-overlay`
+  - `products/cursor-extension`
+  - `products/desktop-overlay`
 - Shared logic:
-  - `packages/protocol`: event and state type contracts
-  - `packages/core`: state engine + render mapping + blink behavior
-  - `packages/adapters`: tool-specific event translators
+  - `libs/protocol`: event and state type contracts
+  - `libs/core`: state engine + render mapping + blink behavior
+  - `libs/adapters`: tool-specific event translators
 
 ## Data Flow
 
@@ -21,4 +21,4 @@ The project uses a shared-core architecture:
 
 ## Reuse Rule
 
-All state decisions live in `packages/core`; UI layers only render.
+All state decisions live in `libs/core`; UI layers only render.

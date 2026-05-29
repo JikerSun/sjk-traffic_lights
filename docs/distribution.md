@@ -10,27 +10,28 @@
 只装 A 不装 B → 灯不会随 AI 自动变。  
 只装 B 不装 A → 可以改 `state.json`，但没有侧边栏 UI。
 
+**不想翻源码：** 从仓库 [`install/`](../install/) 进入对应子目录即可。
+
 ---
 
 ## A. 扩展（本机一次）
 
 ### 方式 1：从 GitHub Release 装 VSIX（推荐给同事）
 
-1. 在 [Releases](https://github.com/YOUR_USER/sjk-traffic_lights/releases) 下载 `ai-traffic-lights-cursor.vsix`
+1. 在 [Releases](https://github.com/JikerSun/sjk-traffic_lights/releases) 下载 `ai-traffic-lights-cursor.vsix`
 2. Cursor → `Cmd+Shift+P` → **Extensions: Install from VSIX...**
 3. **Reload Window**
 
 ### 方式 2：从源码构建 VSIX
 
 ```bash
-git clone https://github.com/YOUR_USER/sjk-traffic_lights.git
+git clone https://github.com/JikerSun/sjk-traffic_lights.git
 cd sjk-traffic_lights
 npm install
-npm run build -w ai-traffic-lights-cursor-extension
-npm run package -w ai-traffic-lights-cursor-extension
+npm run package:extension
 ```
 
-安装 `apps/cursor-extension/ai-traffic-lights-cursor.vsix`（步骤同方式 1）。
+安装 **`install/cursor/extension/ai-traffic-lights-cursor.vsix`**（步骤同方式 1）。
 
 ### 方式 3：本地开发安装
 
@@ -44,14 +45,22 @@ npm run install:cursor-extension:local
 
 ## B. 项目 Hooks（每个仓库一次，约 5 秒）
 
-在 **工具仓库** 里执行（把路径换成你的项目）：
+### 方式 1：只下载 Hooks 文件夹
+
+使用仓库中的 **`install/cursor/workspace-hooks/`**（可单独拷贝或 sparse checkout）：
 
 ```bash
-git clone https://github.com/YOUR_USER/sjk-traffic_lights.git
-~/sjk-traffic_lights/scripts/bootstrap-traffic-lights.sh /path/to/your-project
+install/cursor/workspace-hooks/bootstrap.sh /path/to/your-project
 ```
 
-或在已克隆的工具仓库根目录：
+### 方式 2：从完整仓库 bootstrap
+
+```bash
+git clone https://github.com/JikerSun/sjk-traffic_lights.git
+/path/to/sjk-traffic_lights/tools/bootstrap-traffic-lights.sh /path/to/your-project
+```
+
+或在工具仓库根目录：
 
 ```bash
 npm run bootstrap -- /path/to/your-project
@@ -63,6 +72,8 @@ npm run bootstrap -- /path/to/your-project
 - `.cursor/hooks/write-bridge-from-hook.mjs`
 - `scripts/lib/*.mjs`
 - `.ai-traffic-lights/state.json`（若不存在则创建）
+
+修改本仓库 hooks 后，请执行 `npm run sync:install-kits` 以更新 `install/cursor/workspace-hooks/`。
 
 然后用 **Cursor 打开目标项目根目录** → **Reload Window** → **Status Lights**。
 

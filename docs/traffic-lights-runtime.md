@@ -33,9 +33,9 @@ flowchart LR
 | State rules | [`scripts/lib/bridge-resolve.mjs`](../scripts/lib/bridge-resolve.mjs) | Single mapping table |
 | Ask / transcript | [`scripts/lib/cursor-transcript-state.mjs`](../scripts/lib/cursor-transcript-state.mjs) | AskQuestion phase, latch |
 | Plan session | [`scripts/lib/plan-session.mjs`](../scripts/lib/plan-session.mjs) | `plan.awaitingBuild`, CreatePlan, `.plan.md` |
-| Optional watcher | [`scripts/cursor-state-watcher.mjs`](../scripts/cursor-state-watcher.mjs) | **Opt-in** `npm run bridge:watch` — not started by extension |
-| Extension UI | [`apps/cursor-extension/`](../apps/cursor-extension/) | Reads `state.json` via file watcher |
-| Overlay UI | [`apps/desktop-overlay/`](../apps/desktop-overlay/) | Same bridge file |
+| Optional watcher | [`tools/cursor-state-watcher.mjs`](../tools/cursor-state-watcher.mjs) | **Opt-in** `npm run bridge:watch` — not started by extension |
+| Extension UI | [`products/cursor-extension/`](../products/cursor-extension/) | Reads `state.json` via file watcher |
+| Overlay UI | [`products/desktop-overlay/`](../products/desktop-overlay/) | Same bridge file |
 
 ## State → lights (extension)
 
@@ -108,5 +108,5 @@ Hooks run as **Node subprocess per event**. Minimize work:
 ## Next product steps (see DEVELOPMENT_PLAN §10)
 
 1. **Desktop overlay** — same bridge; validate floating UI (lower effort than new adapter).
-2. **Codex adapter** — new signal source in `packages/adapters`; after overlay stable.
+2. **Codex adapter** — new signal source in `libs/adapters`; after overlay stable.
 3. Revisit yellow / Plan when Cursor improves hooks.

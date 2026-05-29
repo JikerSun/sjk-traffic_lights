@@ -5,7 +5,7 @@ import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(process.cwd());
 const BRIDGE_PATH = resolve(ROOT, ".ai-traffic-lights/state.json");
-const OVERLAY_BRIDGE_PATH = resolve(ROOT, "apps/desktop-overlay/public/.ai-traffic-lights/state.json");
+const OVERLAY_BRIDGE_PATH = resolve(ROOT, "products/desktop-overlay/public/.ai-traffic-lights/state.json");
 const INDEX_PATH = resolve(ROOT, ".ai-traffic-lights/debug-index.json");
 
 const VALID_STATES = new Set([
@@ -65,10 +65,10 @@ async function run() {
 
   if (!cmd || cmd === "help") {
     console.log(`Usage:
-  node scripts/debug-bridge-state.mjs set <STATE> [reason]
-  node scripts/debug-bridge-state.mjs next
-  node scripts/debug-bridge-state.mjs reset
-  node scripts/debug-bridge-state.mjs run-sequence [delayMs=2500]
+  node tools/debug-bridge-state.mjs set <STATE> [reason]
+  node tools/debug-bridge-state.mjs next
+  node tools/debug-bridge-state.mjs reset
+  node tools/debug-bridge-state.mjs run-sequence [delayMs=2500]
 `);
     return;
   }

@@ -10,8 +10,8 @@
     "build": "npm run build:web"
   },
   "dependencies": {
-    "@traffic-lights/core": "file:../../packages/core",
-    "@traffic-lights/protocol": "file:../../packages/protocol"
+    "@traffic-lights/core": "file:../../libs/core",
+    "@traffic-lights/protocol": "file:../../libs/protocol"
   },
   "devDependencies": {
     "typescript": "^5.5.4",

@@ -2,11 +2,11 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseJsonLines, resolveStateFromTranscriptRows } from "./lib/cursor-transcript-state.mjs";
+import { parseJsonLines, resolveStateFromTranscriptRows } from "../scripts/lib/cursor-transcript-state.mjs";
 
 const transcriptPath = process.argv[2];
 if (!transcriptPath) {
-  console.error("Usage: node scripts/verify-transcript-state.mjs <transcript.jsonl>");
+  console.error("Usage: node tools/verify-transcript-state.mjs <transcript.jsonl>");
   process.exitCode = 1;
   process.exit(1);
 }

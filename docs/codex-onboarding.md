@@ -6,7 +6,7 @@ Add Codex support with zero UI changes by implementing only a new adapter.
 
 ## Steps
 
-1. Create `CodexAdapter` in `packages/adapters`.
+1. Create `CodexAdapter` in `libs/adapters`.
 2. Map Codex stream events to unified states.
 3. Record event traces and replay against `TrafficLightEngine`.
 4. Validate transitions with same acceptance criteria as Cursor.

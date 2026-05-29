@@ -70,7 +70,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "package": "vsce package --out ai-traffic-lights-cursor.vsix --allow-missing-repository --skip-license --allow-package-all-secrets"
+    "package": "vsce package --out ../../install/cursor/extension/ai-traffic-lights-cursor.vsix --allow-missing-repository --skip-license --allow-package-all-secrets"
   },
   "dependencies": {},
   "devDependencies": {

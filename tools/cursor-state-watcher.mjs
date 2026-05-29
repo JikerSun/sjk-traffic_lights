@@ -9,14 +9,14 @@ import {
   readSessionTurn,
   clearAskLatch,
   isAskQuestionUnresolved
-} from "./lib/cursor-transcript-state.mjs";
-import { normalizePlanContext } from "./lib/plan-session.mjs";
-import { resolveBridgeState } from "./lib/bridge-resolve.mjs";
+} from "../scripts/lib/cursor-transcript-state.mjs";
+import { normalizePlanContext } from "../scripts/lib/plan-session.mjs";
+import { resolveBridgeState } from "../scripts/lib/bridge-resolve.mjs";
 
 const root = process.cwd();
 const activeSessionPath = resolve(root, ".ai-traffic-lights/active-session.json");
 const bridgePath = resolve(root, ".ai-traffic-lights/state.json");
-const overlayBridgePath = resolve(root, "apps/desktop-overlay/public/.ai-traffic-lights/state.json");
+const overlayBridgePath = resolve(root, "products/desktop-overlay/public/.ai-traffic-lights/state.json");
 
 const once = process.argv.includes("--once");
 const verbose = process.argv.includes("--verbose");

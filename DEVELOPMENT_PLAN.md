@@ -95,11 +95,12 @@ Constraints:
 
 Planned structure:
 
-- `apps/cursor-extension` - Cursor extension UI shell
-- `apps/desktop-overlay` - desktop floating/attach UI shell
-- `packages/core` - state machine + priority + debounce + blink scheduler
-- `packages/protocol` - shared event/type definitions
-- `packages/adapters` - `CursorAdapter` first, later `CodexAdapter`
+- `products/cursor-extension` - Cursor extension UI shell
+- `products/desktop-overlay` - desktop floating/attach UI shell
+- `libs/core` - state machine + priority + debounce + blink scheduler
+- `libs/protocol` - shared event/type definitions
+- `libs/adapters` - `CursorAdapter` first, later `CodexAdapter`
+- `install/` - user-facing install kits (VSIX, workspace-hooks, future desktop/plugins)
 - `docs/` - architecture, adapter spec, state mapping, runbook
 
 ### 3.2 Reuse Boundary
@@ -194,7 +195,7 @@ Exit criteria:
 
 Implementation will follow documented adapter contract only:
 
-1. Add `CodexAdapter` in `packages/adapters`.
+1. Add `CodexAdapter` in `libs/adapters`.
 2. Map Codex events -> unified states.
 3. Validate accuracy using event logs/replay.
 4. No UI changes required unless new state is introduced.
@@ -410,7 +411,7 @@ Hook event log (2026-05-29) showed many `preToolUse`/`postToolUse` as RUNNING, `
 
 ### 2026-05-29 Phase 1 Implementation (v3.0)
 
-New shared module: `scripts/lib/cursor-transcript-state.mjs`
+New shared module: `scripts/lib/cursor-transcript-state.mjs` (unchanged path for bootstrapped projects)
 
 - `resolveStateFromTranscriptRows()` — pending AskQuestion until user row or assistant resolution text after it.
 - `mapHookEventToState()` — hook events + transcript authority on `stop` / `afterAgentResponse`.
@@ -420,7 +421,7 @@ Hook writer (`.cursor/hooks/write-bridge-from-hook.mjs`):
 - Writes `.ai-traffic-lights/active-session.json` (single active conversation + transcript path).
 - `stop` / `afterAgentResponse` use transcript resolver (not blind DONE).
 
-Watcher (`scripts/cursor-state-watcher.mjs` v3.0):
+Watcher (`tools/cursor-state-watcher.mjs` v3.0):
 
 - Reads **only** `active-session.json` transcript (single-session mode).
 - Reconciles bridge when inferred state differs (removed "hook fresh => skip all scanning" behavior).
@@ -428,7 +429,7 @@ Watcher (`scripts/cursor-state-watcher.mjs` v3.0):
 Automated verification (agent-run):
 
 ```bash
-node scripts/verify-transcript-state.mjs <transcript.jsonl>
+node tools/verify-transcript-state.mjs <transcript.jsonl>
 # row 97 -> WAITING_USER, row 98 -> DONE
 
 # Simulated hook stop with transcript ending at AskQuestion:
@@ -493,7 +494,7 @@ node scripts/verify-transcript-state.mjs <transcript.jsonl>
 - Watcher `fs.watch` on `active-session.json` → re-bind when conversation/transcript path changes.
 - `fs.watch` on active transcript `.jsonl` → debounced recompute (~60ms), not only 800ms poll.
 - Poll remains fallback + re-bind if transcript file appears later.
-- Flag: `node scripts/cursor-state-watcher.mjs 800 --no-watch` to disable watch (debug).
+- Flag: `node tools/cursor-state-watcher.mjs 800 --no-watch` to disable watch (debug).
 
 ### User validation (required in Cursor UI)
 

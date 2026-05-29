@@ -1,6 +1,12 @@
 node_modules
 dist
 .DS_Store
+
+# Cursor agent skills (local only, not in repo)
+.cursor/skills/
+
+# Packaged extension (build artifact; also copied to install/cursor/extension/)
+install/cursor/extension/*.vsix
 .vscode-test
 *.vsix
 coverage
