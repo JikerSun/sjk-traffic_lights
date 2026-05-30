@@ -10,13 +10,14 @@ import {
   hydrateAgentsFromDocument,
   normalizeAgentsMap,
   pruneAgents,
+  resolveDisplayDecision,
   shouldWriteBridgeDocument,
   updateAgents
 } from "./multi-agent-bridge.mjs";
 
 const DEBUG = process.env.TRAFFIC_LIGHTS_DEBUG === "1";
 
-function debugMulti(eventName, agentId, agents, counts, mapped) {
+function debugMulti(eventName, agentId, agents, counts, mapped, displayMode) {
   if (!DEBUG) {
     return;
   }
@@ -24,7 +25,7 @@ function debugMulti(eventName, agentId, agents, counts, mapped) {
     .map(([id, agent]) => `${id.slice(-10)}:${agent.state}`)
     .join(" ");
   process.stderr.write(
-    `[bridge:multi] ${eventName} agent=${String(agentId || "?").slice(-16)} mapped=${mapped?.state} n=${Object.keys(agents || {}).length} counts=${JSON.stringify(counts)} [${ids}]\n`
+    `[bridge:multi] ${eventName} mode=${displayMode || "?"} agent=${String(agentId || "?").slice(-16)} mapped=${mapped?.state} n=${Object.keys(agents || {}).length} counts=${JSON.stringify(counts)} [${ids}]\n`
   );
 }
 
@@ -109,11 +110,13 @@ export async function commitBridgeUpdate(options) {
     agents = updateAgents(agents, agentId, mapped, now, eventName);
     agents = normalizeAgentsMap(agents);
     agents = pruneAgents(agents, now);
+    const { mode: displayMode, agents: displayAgents } = resolveDisplayDecision(agents);
+    agents = displayAgents;
     const activeIds = Object.keys(agents);
-    const countsPreview = activeIds.length >= 2 ? computeCounts(agents) : null;
-    debugMulti(eventName, agentId, agents, countsPreview, mapped);
+    const countsPreview = displayMode === "multi" ? computeCounts(agents) : null;
+    debugMulti(eventName, agentId, agents, countsPreview ?? computeCounts(agents), mapped, displayMode);
 
-    if (activeIds.length <= 1) {
+    if (displayMode === "single" || activeIds.length <= 1) {
       const sole = activeIds.length === 1 ? agents[activeIds[0]] : null;
       const singleBase = {
         sessionId,
@@ -134,7 +137,7 @@ export async function commitBridgeUpdate(options) {
     }
 
     const counts = computeCounts(agents);
-    debugMulti(`${eventName}:write`, agentId, agents, counts, mapped);
+    debugMulti(`${eventName}:write`, agentId, agents, counts, mapped, "multi");
     const document = buildMultiDocument(base, agents, counts, workspaceMeta);
     if (!forceWrite && !shouldWriteBridgeDocument(previous, document)) {
       return { wrote: false };

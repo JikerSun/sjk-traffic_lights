@@ -190,6 +190,73 @@ export function computeCounts(agents) {
   return { running, waiting, done, error, plan: 0 };
 }
 
+export function isWorkingState(state) {
+  return (
+    state === "RUNNING" ||
+    state === "WAITING_USER" ||
+    state === "WAITING_PLAN_BUILD" ||
+    state === "ERROR"
+  );
+}
+
+/**
+ * @param {Record<string, { state: AiState, doneAt?: number, lastHookTs?: number, runningSince?: number, ts?: number }>} agents
+ */
+export function isSoloNewAgentWave(agents) {
+  const entries = Object.entries(agents || {});
+  const working = entries.filter(([, agent]) => isWorkingState(agent.state));
+  const done = entries.filter(([, agent]) => agent.state === "DONE");
+  if (working.length !== 1 || done.length === 0) {
+    return false;
+  }
+  const [, worker] = working[0];
+  const maxDoneAt = Math.max(...done.map(([, agent]) => agent.doneAt ?? agent.lastHookTs ?? 0));
+  const runningSince = worker.runningSince ?? worker.lastHookTs ?? worker.ts ?? 0;
+  return runningSince >= maxDoneAt;
+}
+
+/** Drop stale DONE agents when user starts a fresh solo agent after a prior wave finished. */
+export function pruneDoneForSoloWorker(agents) {
+  const next = {};
+  for (const [id, agent] of Object.entries(agents || {})) {
+    if (isWorkingState(agent.state)) {
+      next[id] = agent;
+    }
+  }
+  return next;
+}
+
+/**
+ * @param {Record<string, unknown>} agents
+ * @returns {{ mode: "single" | "multi", agents: Record<string, unknown> }}
+ */
+export function resolveDisplayDecision(agents) {
+  let next = { ...(agents || {}) };
+  let counts = computeCounts(next);
+  let working = counts.running + counts.waiting + counts.error;
+  const done = counts.done;
+
+  if (working >= 2) {
+    return { mode: "multi", agents: next };
+  }
+
+  if (working === 1 && done >= 1) {
+    if (isSoloNewAgentWave(next)) {
+      next = pruneDoneForSoloWorker(next);
+      counts = computeCounts(next);
+      working = counts.running + counts.waiting + counts.error;
+      return { mode: "single", agents: next };
+    }
+    return { mode: "multi", agents: next };
+  }
+
+  if (working === 0 && done >= 2) {
+    return { mode: "multi", agents: next };
+  }
+
+  return { mode: "single", agents: next };
+}
+
 /**
  * @param {{ running: number, waiting: number, done: number, error: number }} counts
  * @returns {AiState}
@@ -240,6 +307,9 @@ export function updateAgents(agents, agentId, mapped, now, eventName) {
     ts: now,
     lastHookTs: now
   };
+  if (isWorkingState(mapped.state)) {
+    agent.runningSince = isWorkingState(prev?.state) ? prev.runningSince ?? now : now;
+  }
   if (mapped.state === "DONE") {
     agent.doneAt = prev?.state === "DONE" ? prev.doneAt ?? now : now;
   }

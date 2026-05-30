@@ -1,4 +1,4 @@
-# Mac 测试指南 — AI Traffic Lights 桌面 App v0.1.1
+# Mac 测试指南 — AI Traffic Lights 桌面 App v0.1.2
 
 > Windows 测试安排在下周一（同事机器）；本文仅 **macOS**。
 
@@ -65,7 +65,7 @@ npm run build:desktop
 | 文件 | 路径 |
 |------|------|
 | `.app` | `products/desktop-overlay/src-tauri/target/release/bundle/macos/AI Traffic Lights.app` |
-| `.dmg` | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg` |
+| `.dmg` | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.2_aarch64.dmg` |
 
 双击 `.app` 或从 DMG 拖入「应用程序」后，**Release 包测试**建议执行：
 

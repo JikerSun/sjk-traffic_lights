@@ -1,7 +1,7 @@
 # 桌面悬浮 App — 实现状态与已知问题
 
 > **最后更新：** 2026-05-30  
-> **版本：** desktop **v0.1.1**（`products/desktop-overlay/package.json` / `tauri.conf.json`）  
+> **版本：** desktop **v0.1.2**（`products/desktop-overlay/package.json` / `tauri.conf.json`）  
 > **接续：** 下次改 App 先读 **本文件 → [HANDOFF.md](HANDOFF.md) §0 → [desktop-app-requirements.md](desktop-app-requirements.md)**
 
 ---
@@ -73,12 +73,12 @@ npm run build:desktop
 
 产物：
 
-- `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg`（Apple Silicon）
+- `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.2_aarch64.dmg`（Apple Silicon）
 - `.../bundle/macos/AI Traffic Lights.app`
 
-本地副本（可选）：`install/desktop/mac/AI Traffic Lights_0.1.1_aarch64.dmg`
+本地副本（可选）：`install/desktop/mac/AI Traffic Lights_0.1.2_aarch64.dmg`
 
-**Release 标签：** `desktop-v0.1.1`（见 [install/desktop/README.md](../install/desktop/README.md) §B）
+**Release 标签：** `desktop-v0.1.2`（见 [install/desktop/README.md](../install/desktop/README.md) §A）
 
 ---
 

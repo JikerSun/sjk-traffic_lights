@@ -1,6 +1,6 @@
 # 项目接续文档（扫描此文件即可继续）
 
-> **最后更新：** 2026-05-30（桌面 App v0.1.1 · Phase 5 手机同步立项暂缓）  
+> **最后更新：** 2026-05-30（扩展 v0.1.6 · 桌面 v0.1.2 · Multi Agent）  
 > **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
 > **分支：** `main`
 
@@ -14,7 +14,7 @@
 |--------|------|------|
 | **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **v0.1.6 已发** | Multi Agent 计数 + Single 回归 · [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) |
 | **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.6 + `install:global-hooks` |
-| **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.1 可装可测** | Tauri · Setup · [desktop-v0.1.1](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.1) |
+| **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.2 已发** | Multi Agent 浮窗 · [desktop-v0.1.2](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) |
 | **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单（运行期切换）；Preferences 卸载步骤弹窗 |
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
 | **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 单用户 · LAN/PWA 或 Tailscale/推送；见 [mobile-sync-plan.md](mobile-sync-plan.md) |
@@ -25,7 +25,7 @@
 
 **扩展稳定版：** **0.1.6** · https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6
 
-**桌面包：** 标签 `desktop-v0.1.1` · 构建 / 发版 pitfalls 见 [`desktop-app-status.md`](desktop-app-status.md) **§3、§7** · 用户安装见 [install/desktop/README.md](../install/desktop/README.md)
+**桌面包：** 标签 **`desktop-v0.1.2`** · 构建 / 发版 pitfalls 见 [`desktop-app-status.md`](desktop-app-status.md) **§3、§7** · 用户安装见 [install/desktop/README.md](../install/desktop/README.md)
 
 ---
 
@@ -268,6 +268,7 @@ npm run bridge:watch                   # 可选
 | 2026-05-29 | **fix workspace_roots** | 全局 Hook 灯不亮根因修复 |
 | 2026-05-29 | **v0.1.5 Release** | VSIX 打包含 `resources/image/`；README 安装/卸载完善 |
 | 2026-05-30 | **desktop-v0.1.1** | Finder 启动修复；安装文档 `xattr`；Mac 分发 pitfalls 文档 |
+| 2026-05-30 | **v0.1.6 + desktop-v0.1.2** | Multi Agent（Hook + 扩展 + 桌面浮窗）；VSIX / dmg Release |
 | 2026-05-30 | **Phase 3.x 多 Agent 设计** | [multi-agent-design.md](multi-agent-design.md) 规格：Single 回归 + Multi 计数 + 性能/内存上界 |
 | 2026-05-30 | **Phase 5 立项暂缓** | 手机同步方案写入 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 2026-05-29 | **Phase 3.1 菜单栏** | 窗口/恢复吸附进菜单；浮窗去掉 ⌖；设置仅 Hook |

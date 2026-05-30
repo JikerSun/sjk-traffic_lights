@@ -11,7 +11,7 @@
 |------|------|
 | Cursor 侧边栏插件（Mac） | ✅ **v0.1.6**（Multi Agent 计数 + Single 回归 + 全局 Hook） |
 | Cursor 侧边栏插件（Windows） | 🧪 待同事实测 VSIX（安装步骤与 Mac 相同） |
-| **桌面悬浮窗 App（Mac）** | ✅ **v0.1.1** — [下载 dmg](https://github.com/JikerSun/sjk-traffic_lights/releases) · [安装说明](install/desktop/README.md) |
+| **桌面悬浮窗 App（Mac）** | ✅ **v0.1.2** — [下载 dmg](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) · Multi Agent · [安装说明](install/desktop/README.md) |
 | 桌面悬浮窗 App（Windows） | 🔴 需 Windows 机构 `.exe`；窗口 API 未实现，见 [install/desktop/README.md](install/desktop/README.md) §C |
 | 黄灯 / Plan 模式 | ⏸ 依赖 Cursor 信号，暂不作为交付要求 |
 
@@ -153,8 +153,8 @@ npm run uninstall:cursor-extension
 
 ### 下载安装（Mac）
 
-1. 打开 **[GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`desktop-v0.1.1`**（或最新 `desktop-v*`）中的  
-   **`AI Traffic Lights_0.1.1_aarch64.dmg`**（Apple Silicon）
+1. 打开 **[GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载标签 **`desktop-v0.1.2`** 中的  
+   **`AI Traffic Lights_0.1.2_aarch64.dmg`**（Apple Silicon）
 2. 双击 dmg → 拖到 **Applications**
 3. 去掉下载隔离：`xattr -cr "/Applications/AI Traffic Lights.app"`
 4. 双击打开（若仍被拦：**系统设置 → 隐私与安全性 → 仍要打开**）
@@ -164,7 +164,7 @@ npm run uninstall:cursor-extension
 详细步骤、卸载、本地构建：[install/desktop/README.md](install/desktop/README.md)  
 功能与已知问题：[docs/desktop-app-status.md](docs/desktop-app-status.md)
 
-> **维护者发 Release：** 本地 `npm run build:desktop` 后 `gh release create desktop-v0.1.1 --attach dmg`，见 install/desktop §B。
+> **维护者发 Release：** 本地 `npm run build:desktop` 后 `gh release create desktop-v0.1.2 --attach dmg`，见 install/desktop §B。
 
 ### Windows `.exe`
 
