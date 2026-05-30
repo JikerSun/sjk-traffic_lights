@@ -203,3 +203,4 @@ products/desktop-overlay/
 | [desktop-app-testing-mac.md](desktop-app-testing-mac.md) | Mac 测试步骤 |
 | [install/desktop/README.md](../install/desktop/README.md) | **dmg 下载 / 安装 / Windows 打 exe** |
 | [distribution.md](distribution.md) | 全产品分发总览 |
+| [mobile-sync-plan.md](mobile-sync-plan.md) | Phase 5 手机同步（暂缓） |

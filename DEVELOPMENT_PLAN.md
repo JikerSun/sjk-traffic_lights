@@ -140,15 +140,16 @@ Blink rule (initial default):
 
 ## 5) Delivery Phases
 
-**Status snapshot (2026-05-29):**
+**Status snapshot (2026-05-30):**
 
 | Phase | Name | Status |
 |-------|------|--------|
 | 0 | Bootstrap + Docs | ✅ Done |
 | 1 | Shared Core | ✅ Done |
 | 2 | Cursor Plugin MVP (Sidebar) | ✅ **Mac 告一段落** (v0.1.5); Windows VSIX 待同事实测 |
-| 3 | Desktop Overlay MVP | 🔜 **Active next** |
-| 4 | Hardening + GitHub Ready | ✅ Partial (README, Release, global hooks); screenshots/CI TBD |
+| 3 | Desktop Overlay MVP | 🟡 **Mac v0.1.1 可装**；Windows stub；见 [desktop-app-status.md](docs/desktop-app-status.md) |
+| 4 | Hardening + GitHub Ready | 🟡 Partial（Release dmg、global hooks、文档）；签名/CI TBD |
+| 5 | Mobile sync (LAN PWA / push) | 📋 **Deferred** — [mobile-sync-plan.md](docs/mobile-sync-plan.md) |
 
 ## Phase 0 - Bootstrap + Docs
 
@@ -200,6 +201,19 @@ Exit criteria:
 Exit criteria:
 
 - Public repo can be cloned, built, and run by others.
+
+## Phase 5 - Mobile Traffic Light Sync (Deferred)
+
+- Single-user pairing (QR); read same `state.json` via desktop **Publisher**.
+- **MVP without native mobile app:** LAN Web/PWA for live three lights on same WiFi; optional ntfy for background alerts.
+- **Later:** Tailscale for away-from-desk; optional iOS/Android app.
+
+Full spec: [docs/mobile-sync-plan.md](docs/mobile-sync-plan.md)
+
+Exit criteria (when resumed):
+
+- Same WiFi: phone browser/PWA shows lights in sync with desktop (<2s).
+- Optional push on `DONE` / `WAITING_USER` / `ERROR`.
 
 ## 6) Codex Future Onboarding (Reserved)
 
@@ -344,10 +358,13 @@ Feedback sent via **Help → Send Feedback** (Bug) describing the above.
 
 ## 10) Next Immediate Steps
 
-1. **Windows VSIX smoke test** — colleagues install v0.1.5 + `npm run install:global-hooks`; verify sidebar images and red→green on Agent run.
-2. **Desktop overlay (Phase 3)** — Tauri shell + floating UI reading global `state.json`; drag + position persistence; Cursor window attach v1.
-3. **Revisit yellow / Plan** only when Cursor API improves or user says **「修 Plan 灯」** (see §9).
-4. Keep **Codex adapter** deferred until overlay MVP is stable.
+1. **Mac desktop polish** — Developer ID sign + notarize (optional); maintain `xattr` docs; [desktop-app-status.md](docs/desktop-app-status.md) §7 release checklist.
+2. **Windows desktop App** — implement `platform_windows.rs`; build `.exe` on Windows ([install/desktop/README.md](install/desktop/README.md) §C).
+3. **Bundled Node** in desktop App resources.
+4. **Windows VSIX smoke test** — colleagues install v0.1.5 + `install:global-hooks`.
+5. **Phase 5 mobile sync** — **deferred**; see [mobile-sync-plan.md](docs/mobile-sync-plan.md).
+6. **Revisit yellow / Plan** only when Cursor API improves or user says **「修 Plan 灯」** (see §9).
+7. Keep **Codex adapter** deferred until desktop MVP is stable on Mac + Windows.
 
 ## 11) Handoff Notes For Next Session
 
