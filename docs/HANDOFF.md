@@ -1,6 +1,6 @@
 # 项目接续文档（扫描此文件即可继续）
 
-> **最后更新：** 2026-05-30（桌面 App v0.1.1 · Finder 启动修复 · xattr 安装文档）  
+> **最后更新：** 2026-05-30（桌面 App v0.1.1 · Phase 5 手机同步立项暂缓）  
 > **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
 > **分支：** `main`
 
@@ -17,6 +17,7 @@
 | **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.1 可装可测** | Tauri · Setup · [desktop-v0.1.1](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.1) |
 | **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单（运行期切换）；Preferences 卸载步骤弹窗 |
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
+| **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 单用户 · LAN/PWA 或 Tailscale/推送；见 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 黄灯 / Plan 红黄闪 | ⏸ 冻结 | Cursor Hook 信号不足 |
 | 多 Agent / Codex | 📋 后期 | 见 `desktop-app-requirements.md` |
 
@@ -198,12 +199,19 @@ npm run bridge:watch                   # 可选
 
 ## 9. 待办优先级（产品）
 
-1. **发 GitHub Release `desktop-v0.1.0` + 附 Mac dmg** — 见 [install/desktop/README.md](../install/desktop/README.md) §B  
-2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（见 install/desktop §C）  
-3. **Windows VSIX 同事实测**  
-4. **内置 Node** 打进 App resources  
-5. **Plan 灯** — 仅当用户要求再动 `scripts/lib/`  
-6. **Codex / 多 Agent** — 后期
+**近期（Phase 3 收尾）**
+
+1. **Mac 分发体验** — Developer ID 签名 + 公证（减少 `xattr`）；或维持文档引导  
+2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（[install/desktop/README.md](../install/desktop/README.md) §C）  
+3. **内置 Node** — 打进 App `resources/node/`，减少 Hook 安装对系统 Node 依赖  
+4. **Windows VSIX 同事实测** — v0.1.5 + `install:global-hooks`  
+5. **桌面 App  polish** — 菜单 Uninstall 与 Preferences 卸载流程一致；Intel Mac x64 dmg / CI（可选）
+
+**冻结 / 后期**
+
+6. **Phase 5 手机同步** — 📋 暂缓；需求与方案见 [mobile-sync-plan.md](mobile-sync-plan.md)（LAN PWA MVP → Tailscale/推送）  
+7. **Plan 灯** — 仅当用户要求 **「修 Plan 灯」** 再动 `scripts/lib/`  
+8. **Codex / 多 Agent** — 后期（[desktop-app-requirements.md](desktop-app-requirements.md)）
 
 ---
 
@@ -233,6 +241,7 @@ npm run bridge:watch                   # 可选
 | [desktop-app-status.md](desktop-app-status.md) | **桌面 App 实现 + 已知问题（接续必读）** |
 | [desktop-app-requirements.md](desktop-app-requirements.md) | 桌面 App 需求 + 多 Agent 备忘 |
 | [desktop-app-testing-mac.md](desktop-app-testing-mac.md) | Mac 桌面 App 测试步骤 |
+| [mobile-sync-plan.md](mobile-sync-plan.md) | **Phase 5 手机同步（暂缓）** |
 | [install/desktop/README.md](../install/desktop/README.md) | **Mac dmg 安装 / 发 Release / Windows 打 exe** |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期计划、历史测试记录 §9–11 |
 | [README.md](../README.md) | 对外入口 |
@@ -256,7 +265,8 @@ npm run bridge:watch                   # 可选
 | 2026-05-29 | 全局 Hooks | `install:global-hooks`，per-workspace state |
 | 2026-05-29 | **fix workspace_roots** | 全局 Hook 灯不亮根因修复 |
 | 2026-05-29 | **v0.1.5 Release** | VSIX 打包含 `resources/image/`；README 安装/卸载完善 |
-| 2026-05-30 | **桌面 App 文档 + dmg** | Setup/菜单分离；`desktop-app-status.md`；install/desktop 安装与 Windows 打包说明 |
+| 2026-05-30 | **desktop-v0.1.1** | Finder 启动修复；安装文档 `xattr`；Mac 分发 pitfalls 文档 |
+| 2026-05-30 | **Phase 5 立项暂缓** | 手机同步方案写入 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 2026-05-29 | **Phase 3.1 菜单栏** | 窗口/恢复吸附进菜单；浮窗去掉 ⌖；设置仅 Hook |
 | 2026-05-29 | **吸附改为触发式** | 取消跟窗 loop；仅启动/恢复吸附时读 bounds |
 

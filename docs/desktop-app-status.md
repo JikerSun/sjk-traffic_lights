@@ -182,7 +182,8 @@ products/desktop-overlay/
 3. **Windows**：实现 `platform_windows.rs` + 在 Windows 机器上 `npm run build:desktop`
 4. 内置 Node 打进 `resources/node/`
 5. 菜单 **Uninstall** 改为打开 Preferences 卸载弹窗（或同样步骤说明）
-6. Intel Mac x64 构建 / CI（GitHub Actions `macos-latest` + `windows-latest`)
+6. Intel Mac x64 构建 / CI（GitHub Actions `macos-latest` + `windows-latest`）
+7. **Phase 5 手机同步** — 📋 暂缓，见 [mobile-sync-plan.md](mobile-sync-plan.md)
 
 ## 7. 发版检查清单（Mac dmg）
 
