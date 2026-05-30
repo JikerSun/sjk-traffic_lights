@@ -1,4 +1,10 @@
+# Monorepo parents (tsconfig extends pulls these in otherwise)
+../**
+../../**
+
 src/**
 tsconfig.json
 node_modules/**
+**/*.ts
+**/*.map
 !dist/**
