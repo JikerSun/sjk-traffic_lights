@@ -1,4 +1,4 @@
-# Mac 测试指南 — AI Traffic Lights 桌面 App v0.1.0
+# Mac 测试指南 — AI Traffic Lights 桌面 App v0.1.1
 
 > Windows 测试安排在下周一（同事机器）；本文仅 **macOS**。
 
@@ -63,9 +63,30 @@ npm run build:desktop
 | 文件 | 路径 |
 |------|------|
 | `.app` | `products/desktop-overlay/src-tauri/target/release/bundle/macos/AI Traffic Lights.app` |
-| `.dmg` | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.0_aarch64.dmg` |
+| `.dmg` | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg` |
 
-双击 `.app` 或从 DMG 拖入「应用程序」即可。
+双击 `.app` 或从 DMG 拖入「应用程序」后，**Release 包测试**建议执行：
+
+```bash
+xattr -cr "/Applications/AI Traffic Lights.app"
+```
+
+---
+
+## 3.1 Release 包专项测试（发版前必做）
+
+对照 [desktop-app-status.md](desktop-app-status.md) **§3.2**：
+
+1. **Gatekeeper / quarantine**：从浏览器下载 dmg 安装后，未 `xattr` 时是否提示「已损坏」；执行 `xattr -cr` 后能否打开。
+2. **Finder 首次启动**：勿从终端启动，**访达双击**；预期 **不「意外退出」**，Hook manifest 可生成（需本机 Node ≥20，常见路径如 Homebrew）。
+3. **模拟最小 PATH**（维护者）：
+
+```bash
+BUNDLE="/Applications/AI Traffic Lights.app/Contents/MacOS/ai-traffic-lights-desktop"
+env -i HOME="$HOME" USER="$USER" PATH="/usr/bin:/bin" "$BUNDLE"
+```
+
+预期：进程存活，Setup 窗口出现。
 
 ---
 
@@ -131,6 +152,8 @@ npm run debug:set:done
 
 | 现象 | 处理 |
 |------|------|
+| **「已损坏，无法打开」** | 非文件损坏；`xattr -cr "/Applications/AI Traffic Lights.app"` 或右键 → 打开 |
+| **「意外退出」** | 升级到 **desktop-v0.1.1+**；或终端启动看报错；见 [desktop-app-status.md](desktop-app-status.md) §3 |
 | 浮窗不出现 | Cursor 是否在跑？是否已绑定窗口？看设置里「Cursor 状态」 |
 | 灯不变 | Hook 是否已装？Reload Cursor；确认 `state.json` 在变 |
 | osascript 报错 | 系统设置 → 隐私与安全性 → **辅助功能** → 允许 AI Traffic Lights / Terminal |
@@ -153,4 +176,5 @@ npm run uninstall:global-hooks
 ## 8. 相关文档
 
 - [desktop-app-requirements.md](desktop-app-requirements.md) — 产品需求
+- [desktop-app-status.md](desktop-app-status.md) — 功能、**Mac 分发 pitfalls（§3）**、发版清单（§7）
 - [HANDOFF.md](HANDOFF.md) — 阶段与接续

@@ -73,14 +73,73 @@ npm run build:desktop
 
 产物：
 
-- `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.0_aarch64.dmg`（Apple Silicon）
+- `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg`（Apple Silicon）
 - `.../bundle/macos/AI Traffic Lights.app`
 
-本地副本（可选）：`install/desktop/mac/AI Traffic Lights_0.1.0_aarch64.dmg`
+本地副本（可选）：`install/desktop/mac/AI Traffic Lights_0.1.1_aarch64.dmg`
+
+**Release 标签：** `desktop-v0.1.1`（见 [install/desktop/README.md](../install/desktop/README.md) §B）
 
 ---
 
-## 3. 已知问题与缺口
+## 3. Mac 分发与启动 — 迭代必读
+
+> **给下一版维护者：** 发 dmg 前对照本节 + §5 发版检查；用户安装步骤见 [install/desktop/README.md](../install/desktop/README.md) §A。
+
+### 3.1 两类「打不开」（不要混为一谈）
+
+| 用户描述 | 实际原因 | 处理 |
+|----------|----------|------|
+| **「已损坏，无法打开」**，只有「移到废纸篓」 | 浏览器下载 **quarantine** + **未签名/未公证**；不是文件真坏 | `xattr -cr "/Applications/AI Traffic Lights.app"`，或右键 → 打开 |
+| **「意外退出」**（能启动一瞬间再崩） | 多为 **v0.1.0** 的启动 bug；v0.1.1 已修 | 升级到 **desktop-v0.1.1**；见 §3.2 |
+
+「系统设置 → 仍要打开」**不是总有**；很多 macOS 版本不会出现，**不能依赖**作为唯一指引。
+
+### 3.2 Finder 启动 vs 终端启动（v0.1.0 根因 · v0.1.1 修复）
+
+| 启动方式 | `PATH` | 首次 Hook 自装 |
+|----------|--------|----------------|
+| **终端**运行 `.app/Contents/MacOS/...` | 含 Homebrew `/opt/homebrew/bin` 等 | ✅ 通常成功 |
+| **访达双击** | 通常只有 `/usr/bin:/bin:...` | v0.1.0：`node` 找不到 → `setup()` 返回 `Err` → **Tauri panic → 意外退出** |
+
+**v0.1.1 代码约束（后续版本勿回退）：**
+
+1. **`hooks::resolve_node`** — 必须用 **绝对路径** 探测常见 Node 位置（`/opt/homebrew/bin/node`、`/usr/local/bin/node`、`.fnm`、`.volta`、包内 `resources/node/…`），不能只依赖 `PATH` 里的 `node`。
+2. **`ensure_hooks_on_first_run`** — Hook 安装失败 **不得** 让 `setup()` 返回 `Err`（Tauri 2 会在 `did_finish_launching` 里 **panic 整进程**）；失败只 `eprintln`，用户可在 Preferences 手动装 Hook。
+3. **长期** — 内置 Node 打进 `resources/node/`（§5 优先级仍保留）。
+
+**发版前自测（模拟同事访达环境）：**
+
+```bash
+# 临时移走 manifest，测「首次安装 Hook」路径
+mv ~/.cursor/ai-traffic-lights/install-manifest.json{,.bak} 2>/dev/null || true
+
+BUNDLE="products/desktop-overlay/src-tauri/target/release/bundle/macos/AI Traffic Lights.app/Contents/MacOS/ai-traffic-lights-desktop"
+env -i HOME="$HOME" USER="$USER" LOGNAME="$LOGNAME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$BUNDLE" &
+sleep 3
+kill %1 2>/dev/null
+
+mv ~/.cursor/ai-traffic-lights/install-manifest.json.bak ~/.cursor/ai-traffic-lights/install-manifest.json 2>/dev/null || true
+```
+
+预期：**进程不崩溃**；若本机有 Homebrew Node，manifest 应被创建。
+
+### 3.3 签名 / 公证 / App Store
+
+| 方式 | 适用 | 说明 |
+|------|------|------|
+| **Developer ID + 公证** | GitHub Release dmg | 解决 Gatekeeper「已损坏」；需 Apple Developer $99/年 |
+| **Mac App Store** | ❌ 不适合本产品 | 需沙盒；改 `~/.cursor/hooks.json`、私有 API 浮窗、读 Cursor 窗口等与 Store 策略冲突 |
+
+未签名时：**文档必须写 `xattr -cr`**，不能假设用户能找到「仍要打开」。
+
+### 3.4 菜单 `set_menu` 死锁（历史坑）
+
+曾在 `setup()` **主线程** 调 `app.set_menu` → 启动卡死/spinning cursor。现 **`menu::init` / `menu::rebuild` 在后台线程** 执行。后续若改菜单初始化，**勿在主线程同步 `set_menu`**。
+
+---
+
+## 4. 已知问题与缺口
 
 | # | 问题 | 严重度 | 说明 |
 |---|------|--------|------|
@@ -97,7 +156,7 @@ npm run build:desktop
 
 ---
 
-## 4. 代码地图（桌面 App）
+## 5. 代码地图（桌面 App）
 
 ```
 products/desktop-overlay/
@@ -116,17 +175,26 @@ products/desktop-overlay/
 
 ---
 
-## 5. 下一步建议（优先级）
+## 6. 下一步建议（优先级）
 
-1. 发 **GitHub Release `desktop-v0.1.0`** 附 Mac dmg（见 install/desktop README）
-2. **Windows**：实现 `platform_windows.rs` + 在 Windows 机器上 `npm run build:desktop`
-3. 内置 Node 打进 `resources/node/`
-4. 菜单 **Uninstall** 改为打开 Preferences 卸载弹窗（或同样步骤说明）
-5. Intel Mac x64 构建 / CI（GitHub Actions `macos-latest` + `windows-latest`）
+1. ~~发 **GitHub Release `desktop-v0.1.0`**~~ → **已发 `desktop-v0.1.1`**（含 Finder 启动修复 + 安装文档 `xattr`）
+2. **Developer ID 签名 + 公证** — 减少用户 `xattr` 步骤（见 §3.3）
+3. **Windows**：实现 `platform_windows.rs` + 在 Windows 机器上 `npm run build:desktop`
+4. 内置 Node 打进 `resources/node/`
+5. 菜单 **Uninstall** 改为打开 Preferences 卸载弹窗（或同样步骤说明）
+6. Intel Mac x64 构建 / CI（GitHub Actions `macos-latest` + `windows-latest`)
+
+## 7. 发版检查清单（Mac dmg）
+
+- [ ] `npm run build:desktop` 成功，dmg 版本号与 `tauri.conf.json` 一致
+- [ ] §3.2 **Finder PATH 自测** 通过（不意外退出）
+- [ ] Release 说明含 **`xattr -cr`** 与 Node ≥20 要求
+- [ ] `gh release create desktop-vX.Y.Z` 附 aarch64 dmg
+- [ ] 更新本文 §2.6 版本路径、 [HANDOFF.md](HANDOFF.md) §0、[install/desktop/README.md](../install/desktop/README.md) §A
 
 ---
 
-## 6. 相关文档
+## 8. 相关文档
 
 | 文档 | 用途 |
 |------|------|

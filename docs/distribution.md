@@ -142,7 +142,7 @@ npm run uninstall:cursor-extension
 **完整说明（安装步骤、卸载、exe 源码路径、已知限制）：**  
 [install/desktop/README.md](../install/desktop/README.md)
 
-**实现状态与问题清单：** [desktop-app-status.md](desktop-app-status.md)
+**实现状态、Mac 分发 pitfalls、发版检查清单：** [desktop-app-status.md](desktop-app-status.md)（**§3 迭代必读** · §7 发版清单）
 
 ---
 
