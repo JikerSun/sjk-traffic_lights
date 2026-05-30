@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Traffic Lights — Setup</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #111317;
+        color: #d8dee9;
+        padding: 24px;
+        box-sizing: border-box;
+        min-height: 100vh;
+      }
+      h1 { font-size: 18px; margin: 0 0 8px; }
+      label { display: block; font-size: 12px; opacity: 0.8; margin: 16px 0 8px; }
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #3b4252;
+        background: #1f2430;
+        color: inherit;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 13px;
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+      button.selected {
+        border-color: #5e81ac;
+        background: #243044;
+      }
+      .hint { font-size: 12px; opacity: 0.75; line-height: 1.6; margin: 0 0 8px; }
+      .status-msg { font-size: 12px; line-height: 1.5; color: #ebcb8b; min-height: 1.2em; margin-top: 8px; }
+      .picker-item { text-align: left; white-space: pre-wrap; }
+      .actions { display: flex; gap: 8px; margin-top: 20px; }
+      .actions button { margin-bottom: 0; flex: 1; }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to AI Traffic Lights</h1>
+    <p class="hint">Choose which IDE to track and bind a window. You can switch later from the menu bar Settings submenu.</p>
+
+    <label>Target IDE</label>
+    <button type="button" class="ide-option selected" data-ide="cursor">Cursor</button>
+    <button type="button" class="ide-option" data-ide="codex">Codex (coming soon)</button>
+    <button type="button" class="ide-option" data-ide="other">Other (coming soon)</button>
+
+    <div id="windowSection">
+      <label>Select Cursor window</label>
+      <div id="windowList"></div>
+      <p id="windowError" class="status-msg"></p>
+    </div>
+
+    <div class="actions">
+      <button id="skipBtn" type="button">Set Up Later</button>
+      <button id="continueBtn" type="button">Continue</button>
+    </div>
+    <script type="module" src="/src/setup.ts"></script>
+  </body>
+</html>

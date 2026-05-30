@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Traffic Lights — Preferences</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #111317;
+        color: #d8dee9;
+        padding: 20px;
+      }
+      h1 { font-size: 18px; margin: 0 0 8px; }
+      h2 {
+        font-size: 13px;
+        margin: 20px 0 10px;
+        opacity: 0.85;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .row { margin-bottom: 12px; line-height: 1.5; }
+      label { display: block; font-size: 12px; opacity: 0.8; margin-bottom: 6px; }
+      select, button {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #3b4252;
+        background: #1f2430;
+        color: inherit;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+      button { cursor: pointer; margin-top: 8px; }
+      button:disabled { opacity: 0.5; cursor: default; }
+      button.danger {
+        border-color: #8f3f3f;
+        background: #2a1717;
+        color: #f0c0c0;
+      }
+      .hint { font-size: 12px; opacity: 0.75; margin-top: 8px; line-height: 1.6; }
+      .status-msg { font-size: 12px; margin-top: 8px; line-height: 1.5; color: #ebcb8b; min-height: 1.2em; }
+      .hidden { display: none !important; }
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        z-index: 10;
+      }
+      .modal.hidden { display: none !important; }
+      .modal-card {
+        width: min(480px, 100%);
+        max-height: min(90vh, 720px);
+        overflow: auto;
+        background: #181b22;
+        border: 1px solid #3b4252;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      .modal-card ol { margin: 12px 0; padding-left: 20px; line-height: 1.65; font-size: 13px; }
+      .modal-card li { margin-bottom: 12px; }
+      .cmd-block {
+        display: block;
+        margin-top: 8px;
+        padding: 10px;
+        background: #0d1117;
+        border: 1px solid #3b4252;
+        border-radius: 6px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-all;
+        user-select: all;
+      }
+      .copy-btn {
+        margin-top: 6px;
+        width: auto;
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+      .modal-actions { margin-top: 16px; }
+    </style>
+  </head>
+  <body>
+    <h1>Preferences</h1>
+    <p class="hint" style="margin-top: 0">Full settings panel. Quick switching while the app is running is in the menu bar Settings submenu.</p>
+
+    <h2>Target IDE</h2>
+    <div class="row">
+      <label for="targetIde">IDE / Editor</label>
+      <select id="targetIde">
+        <option value="cursor">Cursor</option>
+        <option value="codex">Codex</option>
+        <option value="other">Other</option>
+      </select>
+      <p id="targetHint" class="hint"></p>
+    </div>
+
+    <h2>Window</h2>
+    <div class="row">
+      <label for="windowSelect">Tracked Cursor window</label>
+      <select id="windowSelect"></select>
+      <button id="refreshWindowsBtn" type="button">Refresh window list</button>
+      <p id="windowError" class="status-msg"></p>
+      <button id="bindBtn" type="button">Apply selected window</button>
+    </div>
+
+    <h2>Overlay</h2>
+    <div class="row">
+      <button id="restoreAttachBtn" type="button">Restore attach to Cursor window</button>
+    </div>
+
+    <h2>Hook</h2>
+    <div class="row">Global Hook: <strong id="hookStatus">…</strong></div>
+    <div class="row">Cursor status: <strong id="cursorStatus">…</strong></div>
+    <button id="installBtn" type="button">Install / repair Hook</button>
+
+    <h2>Uninstall</h2>
+    <div class="row">
+      <button id="uninstallBtn" type="button" class="danger">Uninstall AI Traffic Lights…</button>
+      <p class="hint">Shows the full uninstall steps (quit app, remove hooks, delete the application).</p>
+    </div>
+
+    <div id="uninstallModal" class="modal hidden">
+      <div class="modal-card">
+        <h2 style="margin: 0 0 8px; font-size: 16px; text-transform: none">Uninstall AI Traffic Lights</h2>
+        <p class="hint" style="margin-top: 0">
+          Follow these steps in order for a clean removal (app + global hooks + bridge data).
+        </p>
+        <ol>
+          <li>
+            <strong>Quit this app.</strong>
+            Use menu bar <strong>AI Traffic Lights → Quit</strong> (or press ⌘Q).
+            Do <em>not</em> run the commands below while the app is still running.
+          </li>
+          <li>
+            <strong>Remove global hooks and bridge data.</strong>
+            Open Terminal and run:
+            <code id="hookCommand" class="cmd-block"></code>
+            <button id="copyHookBtn" type="button" class="copy-btn">Copy command</button>
+            <span class="hint">Removes <code>~/.cursor/ai-traffic-lights/</code> and cleans entries in
+              <code>~/.cursor/hooks.json</code> (same as <code>npm run uninstall:global-hooks</code>).</span>
+          </li>
+          <li>
+            <strong>Remove the application.</strong>
+            <span id="removeAppHint"></span>
+            <code id="removeAppCommand" class="cmd-block"></code>
+            <button id="copyAppBtn" type="button" class="copy-btn">Copy command</button>
+          </li>
+          <li>
+            <strong>Finish up (recommended).</strong>
+            Empty Trash if you deleted the app that way, then restart Cursor.
+          </li>
+        </ol>
+        <div class="modal-actions">
+          <button id="uninstallCloseBtn" type="button">Close</button>
+        </div>
+        <p id="copyFeedback" class="status-msg"></p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/settings.ts"></script>
+  </body>
+</html>

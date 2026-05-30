@@ -5,7 +5,7 @@
 | [**cursor/global-hooks/**](cursor/global-hooks/) | **推荐**：本机装一次，所有 Cursor 项目自动变灯 |
 | [cursor/extension/](cursor/extension/) | 侧边栏扩展 `.vsix` |
 | [cursor/workspace-hooks/](cursor/workspace-hooks/) | 备用：仅单个项目 `bootstrap.sh` |
-| [desktop/](desktop/) | 桌面 App 安装包（预留） |
+| [desktop/](desktop/) | 桌面 App 安装包（**Phase 3 开发中**，源码见 `products/desktop-overlay/`） |
 | [plugins/](plugins/) | 其它 IDE 插件（预留） |
 
 安装与彻底卸载见 [docs/distribution.md](../docs/distribution.md)。

@@ -3,17 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build:web": "vite build",
-    "build": "npm run build:web"
+    "prepare:web": "npm run build -w @traffic-lights/protocol && npm run build -w @traffic-lights/core",
+    "dev:web": "npm run prepare:web && vite",
+    "build:web": "npm run prepare:web && vite build",
+    "build": "npm run build:web",
+    "tauri": "tauri",
+    "dev:app": "bash ../../tools/run-tauri.sh dev",
+    "build:app": "bash ../../tools/run-tauri.sh build"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.5.0",
     "@traffic-lights/core": "file:../../libs/core",
     "@traffic-lights/protocol": "file:../../libs/protocol"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.5.0",
     "typescript": "^5.5.4",
     "vite": "^5.3.4"
   }

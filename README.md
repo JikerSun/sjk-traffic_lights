@@ -3,7 +3,17 @@
 在 Cursor 侧边栏用 **红 / 黄 / 绿** 三盏灯表示 Agent 状态：运行中、等待用户、已完成。
 
 **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
-**扩展包（VSIX）：** [GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases) → `ai-traffic-lights-cursor.vsix`
+**当前稳定版：** [v0.1.5](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.5) · VSIX：`ai-traffic-lights-cursor.vsix`
+
+### 项目阶段
+
+| 阶段 | 状态 |
+|------|------|
+| Cursor 侧边栏插件（Mac） | ✅ v0.1.5 已可用（红 / 绿 / ERROR + 全局 Hook） |
+| Cursor 侧边栏插件（Windows） | 🧪 待同事实测 VSIX（安装步骤与 Mac 相同） |
+| **桌面悬浮窗 App（Mac）** | ✅ **v0.1.0** — [下载 dmg](https://github.com/JikerSun/sjk-traffic_lights/releases) · [安装说明](install/desktop/README.md) |
+| 桌面悬浮窗 App（Windows） | 🔴 需 Windows 机构 `.exe`；窗口 API 未实现，见 [install/desktop/README.md](install/desktop/README.md) §C |
+| 黄灯 / Plan 模式 | ⏸ 依赖 Cursor 信号，暂不作为交付要求 |
 
 ---
 
@@ -33,8 +43,8 @@ Cursor Agent 事件
 
 ### 步骤 1：安装侧边栏扩展（VSIX）
 
-1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载最新 **`ai-traffic-lights-cursor.vsix`**
-2. Cursor → `Cmd+Shift+P` → **Extensions: Install from VSIX...** → 选择该文件
+1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`ai-traffic-lights-cursor.vsix`**（请用 **v0.1.5+**，旧版可能缺侧边栏图片）
+2. Cursor → 命令面板（Mac `Cmd+Shift+P` / Windows `Ctrl+Shift+P`）→ **Extensions: Install from VSIX...** → 选择该文件
 3. 若曾装过旧版：先在 **Extensions** 里卸载 **AI Traffic Lights**，再装新 VSIX
 
 ### 步骤 2：安装全局 Hooks
@@ -65,9 +75,10 @@ npm run install:global-hooks
 
 **状态文件示例：**
 
-`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+- macOS / Linux：`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+- Windows：`%USERPROFILE%\.cursor\ai-traffic-lights\states\<workspace-id>\state.json`
 
-自检：Agent 跑完后打开该文件，`state` 应在 `RUNNING` / `DONE` 等之间变化，且 `workspaceRoot` 为**当前项目路径**（不能是 `~/.cursor`）。
+自检：Agent 跑完后打开该文件，`state` 应在 `RUNNING` / `DONE` 等之间变化，且 `workspaceRoot` 为**当前项目路径**（不能是 `.cursor` 用户目录本身）。
 
 ---
 
@@ -134,16 +145,42 @@ npm run uninstall:cursor-extension
 
 ---
 
+## 桌面悬浮 App（Mac · 独立产品）
+
+不装 VSIX 也可使用：always-on-top 三盏灯浮窗 + App 代装全局 Hook。
+
+### 下载安装（Mac）
+
+1. 打开 **[GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`desktop-v0.1.0`**（或最新 `desktop-v*`）中的  
+   **`AI Traffic Lights_0.1.0_aarch64.dmg`**（Apple Silicon）
+2. 双击 dmg → 拖到 **Applications** → 首次打开若被拦：**系统设置 → 隐私与安全性 → 仍要打开**
+3. 启动 **Setup** 向导：选 IDE + Cursor 窗口 → **Continue**
+4. 需要 **Node.js ≥ 20**（Hook 安装/卸载；日常 Agent 仍由 Cursor 触发 Hook）
+
+详细步骤、卸载、本地构建：[install/desktop/README.md](install/desktop/README.md)  
+功能与已知问题：[docs/desktop-app-status.md](docs/desktop-app-status.md)
+
+> **维护者发 Release：** 本地 `npm run build:desktop` 后 `gh release create desktop-v0.1.0 --attach dmg`，见 install/desktop §B。
+
+### Windows `.exe`
+
+**不能在 Mac 上交叉打出 exe。** 需在 Windows 10/11 上 clone 仓库并 `npm run build:desktop`，产物在  
+`products/desktop-overlay/src-tauri/target/release/bundle/nsis/*-setup.exe`。  
+完整步骤与源码路径：[install/desktop/README.md](install/desktop/README.md) §C。
+
+---
+
 ## 其它安装方式
 
 | 方式 | 说明 |
 |------|------|
-| [Releases VSIX](https://github.com/JikerSun/sjk-traffic_lights/releases) + `install:global-hooks` | **推荐给同事** |
+| [Releases VSIX](https://github.com/JikerSun/sjk-traffic_lights/releases) + `install:global-hooks` | **推荐给同事（侧边栏）** |
+| [Releases desktop dmg](https://github.com/JikerSun/sjk-traffic_lights/releases) | **桌面浮窗 App（Mac）** |
 | `npm run install:cursor-extension:local` | 开发者从源码装扩展（非 VSIX） |
 | `npm run package:extension` | 本地打 VSIX → `install/cursor/extension/` |
 | `install/cursor/workspace-hooks/bootstrap.sh <项目>` | **备用**：仅单个项目 Hook，不推荐日常使用 |
 
-目录说明：[install/](install/) · 开发接续：[docs/HANDOFF.md](docs/HANDOFF.md)
+目录说明：[install/](install/) · 开发接续：[docs/HANDOFF.md](docs/HANDOFF.md) · 桌面 App：[docs/desktop-app-status.md](docs/desktop-app-status.md)
 
 ---
 
@@ -183,6 +220,7 @@ npm run install:cursor-extension:local   # 或 npm run package:extension
 | `npm run uninstall:global-hooks` | 卸 Hooks + `~/.cursor/ai-traffic-lights/` |
 | `npm run uninstall:cursor-extension` | 卸本机扩展目录 |
 | `npm run package:extension` | 构建 VSIX（上传 Release，不提交 git） |
+| `npm run build:desktop` | 构建 Mac `.dmg` / Windows `.exe`（Windows 需在 Windows 机构建） |
 
 ---
 
@@ -191,6 +229,8 @@ npm run install:cursor-extension:local   # 或 npm run package:extension
 | 文档 | 内容 |
 |------|------|
 | [docs/HANDOFF.md](docs/HANDOFF.md) | 进度、架构细节、待办 |
+| [docs/desktop-app-status.md](docs/desktop-app-status.md) | 桌面 App 功能与已知问题 |
+| [install/desktop/README.md](install/desktop/README.md) | Mac dmg 安装 / Windows 打 exe |
 | [docs/distribution.md](docs/distribution.md) | 与本文互补的分发说明 |
 | [docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md) | 运行时逻辑与版本说明 |
 
@@ -198,4 +238,4 @@ npm run install:cursor-extension:local   # 或 npm run package:extension
 
 ## 许可与贡献
 
-VSIX 通过 **Releases** 分发，不提交进 git（见 `.gitignore`）。勿提交各项目 `.ai-traffic-lights/` 运行时文件。
+VSIX / dmg 通过 **Releases** 分发，不提交进 git（见 `.gitignore`）。勿提交各项目 `.ai-traffic-lights/` 运行时文件。

@@ -7,9 +7,11 @@ dist
 
 # Packaged extension (build artifact; also copied to install/cursor/extension/)
 install/cursor/extension/*.vsix
+install/desktop/mac/*.dmg
 
 # Copied from image/ before VSIX pack (source of truth: image/)
 products/cursor-extension/resources/
+products/desktop-overlay/src-tauri/target/
 .vscode-test
 *.vsix
 coverage

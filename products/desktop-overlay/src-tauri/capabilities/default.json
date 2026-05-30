@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.tauri.app/schema/2/capability.json",
+  "identifier": "default",
+  "description": "Default capabilities for AI Traffic Lights desktop",
+  "windows": ["overlay", "settings"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-position",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-focus",
+    "core:window:allow-get-all-windows",
+    "core:webview:allow-create-webview-window",
+    "shell:allow-execute"
+  ]
+}

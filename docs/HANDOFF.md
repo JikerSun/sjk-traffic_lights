@@ -1,16 +1,36 @@
 # 项目接续文档（扫描此文件即可继续）
 
-> **最后更新：** 2026-05-29  
+> **最后更新：** 2026-05-30（桌面 App v0.1.0 Mac dmg · Setup/菜单分离 · 文档同步）  
 > **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
 > **分支：** `main`
 
-下次会话优先读：**本文 → [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`distribution.md`](distribution.md)**
+下次会话优先读：**本文 → [`desktop-app-status.md`](desktop-app-status.md)（桌面 App）→ [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`distribution.md`](distribution.md)**
+
+---
+
+## 0. 当前阶段（2026-05-30）
+
+| 里程碑 | 状态 | 说明 |
+|--------|------|------|
+| **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **告一段落** | v0.1.5 VSIX + 全局 Hook + GitHub Release；红 / 绿 / ERROR 实测 OK |
+| **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.5 + `install:global-hooks` |
+| **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.0 可装可测** | Tauri · Setup 启动向导 · dmg 见 [install/desktop/README.md](../install/desktop/README.md) |
+| **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单（运行期切换）；Preferences 卸载步骤弹窗 |
+| **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
+| 黄灯 / Plan 红黄闪 | ⏸ 冻结 | Cursor Hook 信号不足 |
+| 多 Agent / Codex | 📋 后期 | 见 `desktop-app-requirements.md` |
+
+**桌面 App 接续（功能 + 问题）：** [`docs/desktop-app-status.md`](desktop-app-status.md)
+
+**扩展稳定版（冻结）：** **0.1.5** · https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.5
+
+**桌面包（需 Release 上传 dmg）：** 标签建议 `desktop-v0.1.0` · 构建见 `install/desktop/README.md` §B
 
 ---
 
 ## 1. 项目是什么
 
-在 **Cursor 侧边栏**（未来还有桌面悬浮窗）用三盏灯表示 Agent 状态：
+在 **Cursor 侧边栏**（桌面悬浮窗为下一阶段）用三盏灯表示 Agent 状态：
 
 | 状态 | 灯 | 稳定性 |
 |------|-----|--------|
@@ -21,7 +41,7 @@
 | `WAITING_PLAN_BUILD` | 红黄交替 | ⚠️ Plan 阶段 Hook 难 latch，多数仍红灯 |
 | `IDLE` | 全灭 | ✅ |
 
-扩展版本：**0.1.4**（`products/cursor-extension/package.json`）  
+扩展版本：**0.1.5**（`products/cursor-extension/package.json`）  
 UI 面板相对设计稿约 **54%**（75%×80%×90%，见 `sidebarProvider.ts` / `desktop-overlay/index.html`）。
 
 ---
@@ -50,8 +70,8 @@ scripts/lib/plan-session.mjs           （Plan 上下文）
 
 | 步骤 | 命令 / 位置 | 次数 |
 |------|-------------|------|
-| 全局 Hooks | `npm run install:global-hooks` | 每台 Mac **1 次** |
-| 侧边栏扩展 | VSIX 或 `npm run install:cursor-extension:local` | 每台 Mac **1 次** |
+| 全局 Hooks | `npm run install:global-hooks` | 每台电脑 **1 次** |
+| 侧边栏扩展 | VSIX 或 `npm run install:cursor-extension:local` | 每台电脑 **1 次** |
 | Reload | Cursor **Reload Window** | 每次装完后 |
 
 状态文件示例：
@@ -118,7 +138,7 @@ sjk-traffic_lights/
 ├── install/                    # 给用户：VSIX、global-hooks 说明、workspace-hooks 备用
 ├── products/
 │   ├── cursor-extension/       # 侧边栏扩展（主交付）
-│   └── desktop-overlay/        # 桌面 Web 脚手架（未打包）
+│   └── desktop-overlay/        # Tauri 桌面 App（Mac dmg 可测）
 ├── libs/                       # core / protocol / adapters
 ├── scripts/lib/                # Hook 共享库（安装时复制到 ~/.cursor/ai-traffic-lights/lib）
 ├── tools/                      # install-global-hooks、bootstrap、debug、merge-user-hooks
@@ -178,11 +198,28 @@ npm run bridge:watch                   # 可选
 
 ## 9. 待办优先级（产品）
 
-1. **验证全局 Hook 修复后** 多项目、多文件夹打开是否都变灯。  
-2. **桌面 overlay**（`products/desktop-overlay`）— 同一 bridge，浮窗 UI。  
-3. **Plan 灯** — 仅当用户要求「修 Plan 灯」再动 `plan-session.mjs` / hook。  
-4. **Codex adapter** — `libs/adapters`，overlay 稳定后。  
-5. **GitHub Releases** — 上传 VSIX，减少同事 clone 构建。
+1. **发 GitHub Release `desktop-v0.1.0` + 附 Mac dmg** — 见 [install/desktop/README.md](../install/desktop/README.md) §B  
+2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（见 install/desktop §C）  
+3. **Windows VSIX 同事实测**  
+4. **内置 Node** 打进 App resources  
+5. **Plan 灯** — 仅当用户要求再动 `scripts/lib/`  
+6. **Codex / 多 Agent** — 后期
+
+---
+
+## 9.1 桌面 App 产品决策（2026-05-29 · 已锁定）
+
+| # | 决策 |
+|---|------|
+| Q1 | **B** — 拖动后自由位置；「恢复吸附」再跟窗 |
+| Q2 | 检测 Node≥20；有 → 系统 `node`；无 → App 内置 Node |
+| Q3 | 卸载 App 同步卸 Hook；`hooks.json` 无其它内容则删整文件 |
+| Q4 | 首启 1 窗自动 / 多窗弹选；设置下拉；低频检测窗口变化后再弹选 |
+| Q5 | **Mac + Windows 同代码**；不行则 Mac 先、Windows 后 |
+| Q6 | **占满屏 = 全屏**（含最大化）；浮窗 **always-on-top**（系统级弹窗除外） |
+| — | Cursor **退出** → **hide**；**无跟窗位置 loop**（仅触发式一次吸附，见 desktop-app-requirements §1.2） |
+
+全文：[desktop-app-requirements.md](desktop-app-requirements.md)
 
 ---
 
@@ -193,7 +230,10 @@ npm run bridge:watch                   # 可选
 | **HANDOFF.md**（本文件） | 进度 + 逻辑 + 接续 |
 | [traffic-lights-runtime.md](traffic-lights-runtime.md) | 运行时细节、限制、版本 |
 | [distribution.md](distribution.md) | 安装 / 卸载 / 检查清单 |
-| [architecture.md](architecture.md) | 模块边界 |
+| [desktop-app-status.md](desktop-app-status.md) | **桌面 App 实现 + 已知问题（接续必读）** |
+| [desktop-app-requirements.md](desktop-app-requirements.md) | 桌面 App 需求 + 多 Agent 备忘 |
+| [desktop-app-testing-mac.md](desktop-app-testing-mac.md) | Mac 桌面 App 测试步骤 |
+| [install/desktop/README.md](../install/desktop/README.md) | **Mac dmg 安装 / 发 Release / Windows 打 exe** |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期计划、历史测试记录 §9–11 |
 | [README.md](../README.md) | 对外入口 |
 
@@ -212,9 +252,13 @@ npm run bridge:watch                   # 可选
 |------|----------|------|
 | 2026-05-29 | 初始上 GitHub | `JikerSun/sjk-traffic_lights` |
 | 2026-05-29 | `install/` 目录重组 | products / libs / tools |
-| 2026-05-29 | UI 缩小 | 面板约 54%，commit 备注「充值UI大小」 |
+| 2026-05-29 | UI 缩小 | 面板约 54% |
 | 2026-05-29 | 全局 Hooks | `install:global-hooks`，per-workspace state |
 | 2026-05-29 | **fix workspace_roots** | 全局 Hook 灯不亮根因修复 |
+| 2026-05-29 | **v0.1.5 Release** | VSIX 打包含 `resources/image/`；README 安装/卸载完善 |
+| 2026-05-30 | **桌面 App 文档 + dmg** | Setup/菜单分离；`desktop-app-status.md`；install/desktop 安装与 Windows 打包说明 |
+| 2026-05-29 | **Phase 3.1 菜单栏** | 窗口/恢复吸附进菜单；浮窗去掉 ⌖；设置仅 Hook |
+| 2026-05-29 | **吸附改为触发式** | 取消跟窗 loop；仅启动/恢复吸附时读 bounds |
 
 ---
 

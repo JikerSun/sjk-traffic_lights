@@ -1,6 +1,6 @@
 # AI Traffic Lights — Runtime Logic & Known Limits
 
-Reference for later iteration. **Quick continue:** [`HANDOFF.md`](HANDOFF.md). **Do not** rely on local `*.log` files under `.ai-traffic-lights/` (removed); use `state.json` + optional `TRAFFIC_LIGHTS_DEBUG=1` stderr from hooks.
+Reference for later iteration. **Quick continue:** [`HANDOFF.md`](HANDOFF.md) §0 (phase). **Extension baseline:** v0.1.5. **Do not** rely on local `*.log` files under `.ai-traffic-lights/` (removed); use `state.json` + optional `TRAFFIC_LIGHTS_DEBUG=1` stderr from hooks.
 
 ## Architecture
 
@@ -108,6 +108,7 @@ Hooks run as **Node subprocess per event**. Minimize work:
 
 ## Next product steps (see DEVELOPMENT_PLAN §10)
 
-1. **Desktop overlay** — same bridge; validate floating UI (lower effort than new adapter).
-2. **Codex adapter** — new signal source in `libs/adapters`; after overlay stable.
-3. Revisit yellow / Plan when Cursor improves hooks.
+1. **Windows VSIX validation** — same bridge paths on `%USERPROFILE%\.cursor\`.
+2. **Desktop overlay (Phase 3)** — same bridge; floating UI + Tauri shell.
+3. **Codex adapter** — after overlay stable.
+4. Revisit yellow / Plan when Cursor improves hooks.

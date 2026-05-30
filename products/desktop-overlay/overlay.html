@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Traffic Lights</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body {
+        margin: 0;
+        background: transparent;
+        overflow: hidden;
+        user-select: none;
+      }
+      .overlay {
+        position: relative;
+        width: 60.48px;
+        height: 161.46px;
+        cursor: move;
+        -webkit-app-region: drag;
+      }
+      .panel-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .light {
+        position: absolute;
+        width: 48.6px;
+        height: 48.6px;
+        left: 5.94px;
+        pointer-events: none;
+      }
+      #red { top: 10.26px; }
+      #yellow { top: 56.43px; }
+      #green { top: 102.6px; }
+    </style>
+  </head>
+  <body>
+    <div class="overlay" id="overlay">
+      <img id="panelBg" class="panel-bg" alt="" />
+      <img id="red" class="light" alt="" />
+      <img id="yellow" class="light" alt="" />
+      <img id="green" class="light" alt="" />
+    </div>
+    <script type="module" src="/src/overlay.ts"></script>
+  </body>
+</html>

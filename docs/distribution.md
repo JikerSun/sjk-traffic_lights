@@ -33,7 +33,8 @@ npm run install:cursor-extension:local
 
 状态文件（按工作区隔离，不污染业务仓库）：
 
-`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+- macOS / Linux：`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+- Windows：`%USERPROFILE%\.cursor\ai-traffic-lights\states\<workspace-id>\state.json`
 
 详见 [`install/cursor/global-hooks/README.md`](../install/cursor/global-hooks/README.md)。
 
@@ -126,6 +127,22 @@ npm run uninstall:cursor-extension
 最后 **Reload Window**。
 
 **说明：** 无后台常驻进程；卸载后不会占用 CPU/内存。未删除的 `state.json` 只是磁盘上的小 JSON 文件，不是内存泄漏。
+
+---
+
+## C. 桌面悬浮 App（Mac dmg / Windows exe）
+
+独立产品，不依赖 VSIX。Hook 由 App 首次启动安装。
+
+| 平台 | 用户安装 | 维护者构建 |
+|------|----------|------------|
+| **Mac** | [Releases](https://github.com/JikerSun/sjk-traffic_lights/releases) 下载 `desktop-v*` 的 `.dmg` | `npm run build:desktop` → 上传 dmg |
+| **Windows** | 待 Release 提供 `*-setup.exe` | **须在 Windows 上** 同命令构建 |
+
+**完整说明（安装步骤、卸载、exe 源码路径、已知限制）：**  
+[install/desktop/README.md](../install/desktop/README.md)
+
+**实现状态与问题清单：** [desktop-app-status.md](desktop-app-status.md)
 
 ---
 

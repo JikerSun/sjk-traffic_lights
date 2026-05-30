@@ -140,6 +140,16 @@ Blink rule (initial default):
 
 ## 5) Delivery Phases
 
+**Status snapshot (2026-05-29):**
+
+| Phase | Name | Status |
+|-------|------|--------|
+| 0 | Bootstrap + Docs | ✅ Done |
+| 1 | Shared Core | ✅ Done |
+| 2 | Cursor Plugin MVP (Sidebar) | ✅ **Mac 告一段落** (v0.1.5); Windows VSIX 待同事实测 |
+| 3 | Desktop Overlay MVP | 🔜 **Active next** |
+| 4 | Hardening + GitHub Ready | ✅ Partial (README, Release, global hooks); screenshots/CI TBD |
+
 ## Phase 0 - Bootstrap + Docs
 
 - Initialize monorepo and baseline tooling.
@@ -334,19 +344,26 @@ Feedback sent via **Help → Send Feedback** (Bug) describing the above.
 
 ## 10) Next Immediate Steps
 
-1. **Validate `WAITING_PLAN_BUILD`** (red ↔ yellow alternate after plan, until Build) in real Plan mode — user testing.
-2. Freeze adapter contract after Plan validation; desktop/Tauri packaging when ready.
-3. **Revisit yellow** only after Cursor API/transcript timing improves (see §9).
-4. Keep Codex adapter deferred until Cursor state chain is acceptable for shipping.
+1. **Windows VSIX smoke test** — colleagues install v0.1.5 + `npm run install:global-hooks`; verify sidebar images and red→green on Agent run.
+2. **Desktop overlay (Phase 3)** — Tauri shell + floating UI reading global `state.json`; drag + position persistence; Cursor window attach v1.
+3. **Revisit yellow / Plan** only when Cursor API improves or user says **「修 Plan 灯」** (see §9).
+4. Keep **Codex adapter** deferred until overlay MVP is stable.
 
 ## 11) Handoff Notes For Next Session
 
-- **Start here:** [`docs/HANDOFF.md`](docs/HANDOFF.md) — progress, architecture, global hooks, install/uninstall, open tasks (updated 2026-05-29).
+- **Start here:** [`docs/HANDOFF.md`](docs/HANDOFF.md) — phase table §0, global hooks, install/uninstall (updated 2026-05-29).
 - **Runtime detail:** [`docs/traffic-lights-runtime.md`](docs/traffic-lights-runtime.md) (logic, limits, performance v4.7).
-- **Ship without reliable yellow / Plan-wait**; see §9 and runtime doc.
-- **Global hooks (2026-05-29):** `npm run install:global-hooks`; state under `~/.cursor/ai-traffic-lights/states/<id>/`; must use `workspace_roots[0]` in hook (not `process.cwd()`).
+- **Ship without reliable yellow / Plan-wait**; Mac Cursor sidebar at **v0.1.5** is the delivery baseline.
+- **Global hooks:** `npm run install:global-hooks`; state under `~/.cursor/ai-traffic-lights/states/<id>/` (Windows: `%USERPROFILE%\.cursor\...`); must use `workspace_roots[0]` in hook (not `process.cwd()`).
 - Do not add yellow/plan heuristics without new Cursor signals unless user says **「修 Plan 灯」**.
-- **Next product work:** verify global hook fix → desktop overlay → Plan/Codex when requested.
+- **Next product work:** Windows validation → **desktop overlay** → Plan/Codex when requested.
+
+### 2026-05-29 — Cursor plugin Mac phase complete
+
+- Extension **v0.1.5** on GitHub Releases (VSIX includes panel/light PNGs).
+- Global hooks + per-workspace `state.json`; README install/uninstall documented.
+- User confirmed red / green / ERROR in real Agent flows.
+- **Next session default:** start `products/desktop-overlay` (Phase 3), not extension feature creep.
 
 ### 2026-05-29 v4.7 — performance & docs cleanup
 

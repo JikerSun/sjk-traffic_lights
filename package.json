@@ -32,7 +32,9 @@
     "uninstall:global-hooks": "bash tools/uninstall-global-hooks.sh",
     "uninstall:cursor-extension": "bash tools/uninstall-cursor-extension.sh",
     "bootstrap": "bash tools/bootstrap-traffic-lights.sh",
-    "package:extension": "npm run copy:extension-assets && npm run build -w ai-traffic-lights-cursor-extension && npm run package -w ai-traffic-lights-cursor-extension"
+    "sync:hook-kit": "bash tools/sync-hook-kit.sh",
+    "dev:desktop": "npm run sync:hook-kit && npm run dev:app -w ai-traffic-lights-desktop-overlay",
+    "build:desktop": "npm run sync:hook-kit && npm run build:app -w ai-traffic-lights-desktop-overlay"
   },
   "engines": {
     "node": ">=20"
