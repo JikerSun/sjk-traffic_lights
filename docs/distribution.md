@@ -1,5 +1,6 @@
 # 分发与安装（任意 Cursor 项目）
 
+> 用户入口：[README.md](../README.md)（中文）· [README.en.md](../README.en.md)（English）  
 > 接续总览见 [`HANDOFF.md`](HANDOFF.md)。
 
 ## 重要：两层安装

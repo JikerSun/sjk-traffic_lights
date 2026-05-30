@@ -1,8 +1,8 @@
 # 多 Agent 状态检测与计数 UI — 设计规格
 
-> **状态：** ✅ **已实施**（2026-05-30，扩展 **v0.1.6** + 全局 Hook + 桌面 overlay 同 core）  
-> **优先级：** Phase 3.x（Mac 桌面 v0.1.1 之后）· 在 **单 Agent 行为零回归** 前提下开发  
-> **接续：** [HANDOFF.md](HANDOFF.md) §0 · [desktop-app-requirements.md](desktop-app-requirements.md) §2 · [traffic-lights-runtime.md](traffic-lights-runtime.md)
+> **状态：** ✅ **已实施并实测**（2026-05-30，扩展 **v0.1.6** + 桌面 **v0.1.2** + 全局 Hook）  
+> **阶段：** Cursor 单 / 多 Agent 监听 **本阶段告一段落**；后续仅 bugfix / 微调，新功能见 [HANDOFF.md](HANDOFF.md) §9  
+> **接续：** [HANDOFF.md](HANDOFF.md) §0 · [traffic-lights-runtime.md](traffic-lights-runtime.md)
 
 ---
 

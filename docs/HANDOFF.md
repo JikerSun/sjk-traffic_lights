@@ -1,25 +1,29 @@
 # 项目接续文档（扫描此文件即可继续）
 
-> **最后更新：** 2026-05-30（扩展 v0.1.6 · 桌面 v0.1.2 · Multi Agent）  
+> **最后更新：** 2026-05-30（扩展 v0.1.6 · 桌面 v0.1.2 · Multi Agent · **监听阶段告一段落**）  
 > **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
-> **分支：** `main`
+> **分支：** `main`  
+> **对外 README：** [中文](../README.md) · [English](../README.en.md)
 
-下次会话优先读：**本文 → [`desktop-app-status.md`](desktop-app-status.md)（桌面 App）→ [`multi-agent-design.md`](multi-agent-design.md)（若做 Multi Agent）→ [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`distribution.md`](distribution.md)**
+下次会话优先读：**本文 §0–§9 → [`desktop-app-status.md`](desktop-app-status.md) → [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`multi-agent-design.md`](multi-agent-design.md)（已实现，改 Multi 时对照）→ [`distribution.md`](distribution.md)**
 
 ---
 
 ## 0. 当前阶段（2026-05-30）
 
+> **Cursor 单 / 多 Agent 监听（Hook → bridge → 扩展 / 桌面 UI）本阶段告一段落。** Mac 侧边栏 v0.1.6、桌面浮窗 v0.1.2 均已 Release 且实测通过；后续迭代见 §9，**未明确要求前勿动 Plan / 黄灯启发式**。
+
 | 里程碑 | 状态 | 说明 |
 |--------|------|------|
-| **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **v0.1.6 已发** | Multi Agent 计数 + Single 回归 · [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) |
-| **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.6 + `install:global-hooks` |
+| **Phase 2 — Cursor 单 / 多 Agent 监听** | ✅ **告一段落** | Hook + `state.json` bridge · Single 回归 + Multi 计数 · 扩展 v0.1.6 + 桌面 v0.1.2 |
+| **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **v0.1.6 已发** | [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) |
+| **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.6 + `install:global-hooks`（或仅桌面 App 自动 Hook） |
 | **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.2 已发** | Multi Agent 浮窗 · [desktop-v0.1.2](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) |
-| **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单（运行期切换）；Preferences 卸载步骤弹窗 |
+| **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单；Preferences 卸载步骤弹窗 |
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
-| **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 单用户 · LAN/PWA 或 Tailscale/推送；见 [mobile-sync-plan.md](mobile-sync-plan.md) |
-| 黄灯 / Plan 红黄闪 | ⏸ 冻结 | Cursor Hook 信号不足 |
-| 多 Agent / Codex | ✅ **v0.1.6 已实施** | Hook + 扩展 + 桌面 overlay · [multi-agent-design.md](multi-agent-design.md) |
+| **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 见 [mobile-sync-plan.md](mobile-sync-plan.md) |
+| 黄灯 / Plan 红黄闪 | ⏸ **冻结** | Cursor Hook 信号不足；用户未说「修 Plan 灯」不改 |
+| 多 Agent | ✅ **已实施** | [multi-agent-design.md](multi-agent-design.md) · 共享 core：`libs/protocol` + `libs/core` |
 
 **桌面 App 接续（功能 + 问题）：** [`docs/desktop-app-status.md`](desktop-app-status.md)
 
@@ -31,7 +35,7 @@
 
 ## 1. 项目是什么
 
-在 **Cursor 侧边栏**（桌面悬浮窗为下一阶段）用三盏灯表示 Agent 状态：
+在 **Cursor 侧边栏** 与 **Mac 桌面浮窗** 用三盏灯表示 Agent 状态：
 
 | 状态 | 灯 | 稳定性 |
 |------|-----|--------|
@@ -60,7 +64,7 @@ scripts/lib/plan-session.mjs           （Plan 上下文）
     ↓
 ~/.cursor/ai-traffic-lights/states/<workspaceId>/state.json
     ↓
-扩展 products/cursor-extension（fs.watch 读 state.json）→ 侧边栏 Webview 三盏灯
+扩展 products/cursor-extension 或 桌面 products/desktop-overlay（fs.watch）→ 三盏灯 UI
 ```
 
 **关键：** 每个「工作区根目录」一个 `workspaceId`（`sha256(绝对路径)` 前 16 位），避免多项目串灯。
@@ -197,22 +201,26 @@ npm run bridge:watch                   # 可选
 
 ---
 
-## 9. 待办优先级（产品）
+## 9. 待办优先级（下一阶段迭代）
 
-**近期（Phase 3 收尾）**
+**本阶段已完成（勿重复立项）：** 单 Agent 监听 · Multi Agent 计数 · Mac 扩展 v0.1.6 · Mac 桌面 v0.1.2 · 全局 Hook 安装/卸载 · 桌面 App 首启自动 Hook。
 
-1. **Mac 分发体验** — Developer ID 签名 + 公证（减少 `xattr`）；或维持文档引导  
-2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（[install/desktop/README.md](../install/desktop/README.md) §C）  
-3. **内置 Node** — 打进 App `resources/node/`，减少 Hook 安装对系统 Node 依赖  
-4. **Windows VSIX 同事实测** — v0.1.5 + `install:global-hooks`  
-5. **桌面 App  polish** — 菜单 Uninstall 与 Preferences 卸载流程一致；Intel Mac x64 dmg / CI（可选）
+**近期（按优先级）**
 
-**冻结 / 后期**
+1. **Windows VSIX 同事实测** — v0.1.6；文档 [README.md](../README.md) / [README.en.md](../README.en.md)
+2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（[install/desktop/README.md](../install/desktop/README.md) §C）
+3. **Mac 分发体验** — Developer ID 签名 + 公证（减少 `xattr`）；或维持文档引导
+4. **内置 Node** — 打进 App `resources/node/`，减少 Hook 安装对系统 Node 依赖
+5. **桌面 App polish** — 菜单 Uninstall 与 Preferences 一致；Intel Mac x64 dmg / CI（可选）
 
-6. **Phase 3.x 多 Agent** — Hook spike → `scripts/lib/` bridge v2 → Single 回归 → Multi UI；见 [multi-agent-design.md](multi-agent-design.md)  
-7. **Phase 5 手机同步** — 📋 暂缓；见 [mobile-sync-plan.md](mobile-sync-plan.md)  
-8. **Plan 灯** — 仅当用户要求 **「修 Plan 灯」** 再动 `scripts/lib/`  
-9. **Codex** — 后期（[desktop-app-requirements.md](desktop-app-requirements.md)）
+**冻结 / 仅用户明确要求时**
+
+6. **Plan 灯 / 黄灯** — 仅当用户说 **「修 Plan 灯」** 再动 `scripts/lib/`（见 §7）
+7. **Phase 5 手机同步** — 📋 暂缓；[mobile-sync-plan.md](mobile-sync-plan.md)
+8. **Codex IDE 支持** — 后期；[desktop-app-requirements.md](desktop-app-requirements.md)
+9. **Multi Agent 微调** — 对照 [multi-agent-design.md](multi-agent-design.md) §8 回归；改 Hook 后 `sync:hook-kit` + 扩展/桌面 rebuild
+
+**调试 Multi Agent：** `npm run debug:multi:clear` · `npm run debug:multi:inspect`
 
 ---
 
@@ -246,7 +254,8 @@ npm run bridge:watch                   # 可选
 | [multi-agent-design.md](multi-agent-design.md) | **Phase 3.x 多 Agent 设计** |
 | [install/desktop/README.md](../install/desktop/README.md) | **Mac dmg 安装 / 发 Release / Windows 打 exe** |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期计划、历史测试记录 §9–11 |
-| [README.md](../README.md) | 对外入口 |
+| [README.md](../README.md) | 对外入口（中文） |
+| [README.en.md](../README.en.md) | 对外入口（English） |
 
 ---
 
@@ -269,6 +278,7 @@ npm run bridge:watch                   # 可选
 | 2026-05-29 | **v0.1.5 Release** | VSIX 打包含 `resources/image/`；README 安装/卸载完善 |
 | 2026-05-30 | **desktop-v0.1.1** | Finder 启动修复；安装文档 `xattr`；Mac 分发 pitfalls 文档 |
 | 2026-05-30 | **v0.1.6 + desktop-v0.1.2** | Multi Agent（Hook + 扩展 + 桌面浮窗）；VSIX / dmg Release |
+| 2026-05-30 | **监听阶段告一段落** | 文档：README 中/英 · HANDOFF §9 下一阶段待办 |
 | 2026-05-30 | **Phase 3.x 多 Agent 设计** | [multi-agent-design.md](multi-agent-design.md) 规格：Single 回归 + Multi 计数 + 性能/内存上界 |
 | 2026-05-30 | **Phase 5 立项暂缓** | 手机同步方案写入 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 2026-05-29 | **Phase 3.1 菜单栏** | 窗口/恢复吸附进菜单；浮窗去掉 ⌖；设置仅 Hook |

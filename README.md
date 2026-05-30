@@ -1,19 +1,28 @@
 # AI Traffic Lights
 
-在 Cursor 侧边栏用 **红 / 黄 / 绿** 三盏灯表示 Agent 状态：运行中、等待用户、已完成。
+**语言 / Language：** **简体中文**（当前） · [English](README.en.md)
+
+在 Cursor 侧边栏或桌面浮窗用 **红 / 黄 / 绿** 三盏灯表示 Agent 状态：运行中、等待用户、已完成。支持 **单 Agent** 与 **多 Agent 并行** 计数（扩展 v0.1.6 · 桌面 v0.1.2）。
 
 **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
-**当前稳定版：** [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) · VSIX：`ai-traffic-lights-cursor.vsix`（Multi Agent）
+**当前稳定版：**
 
-### 项目阶段
+| 产品 | 版本 | 下载 |
+|------|------|------|
+| Cursor 侧边栏扩展 | **v0.1.6** | [Release](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) · `ai-traffic-lights-cursor.vsix` |
+| Mac 桌面浮窗 App | **v0.1.2** | [Release](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) · `AI Traffic Lights_0.1.2_aarch64.dmg` |
+
+### 项目阶段（2026-05-30）
 
 | 阶段 | 状态 |
 |------|------|
-| Cursor 侧边栏插件（Mac） | ✅ **v0.1.6**（Multi Agent 计数 + Single 回归 + 全局 Hook） |
-| Cursor 侧边栏插件（Windows） | 🧪 待同事实测 VSIX（安装步骤与 Mac 相同） |
-| **桌面悬浮窗 App（Mac）** | ✅ **v0.1.2** — [下载 dmg](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) · Multi Agent · [安装说明](install/desktop/README.md) |
-| 桌面悬浮窗 App（Windows） | 🔴 需 Windows 机构 `.exe`；窗口 API 未实现，见 [install/desktop/README.md](install/desktop/README.md) §C |
+| Cursor 单 / 多 Agent 监听（Hook + 状态桥） | ✅ **本阶段告一段落**（Single 回归 + Multi 计数已测通） |
+| Cursor 侧边栏插件（Mac） | ✅ **v0.1.6** 已发布 |
+| Cursor 侧边栏插件（Windows） | 🧪 待同事实测 VSIX |
+| Mac 桌面悬浮窗 App | ✅ **v0.1.2** 已发布 · [安装说明](install/desktop/README.md) |
+| Windows 桌面 App | 🔴 需 Windows 机构 `.exe`；窗口 API 未实现 |
 | 黄灯 / Plan 模式 | ⏸ 依赖 Cursor 信号，暂不作为交付要求 |
+| 手机同步 / Codex | 📋 后期，见 [docs/HANDOFF.md](docs/HANDOFF.md) |
 
 ---
 
@@ -21,21 +30,22 @@
 
 | 层级 | 装几次 | 作用 | 装在哪 |
 |------|--------|------|--------|
-| **A. Cursor 扩展** | 每台电脑 1 次 | 侧边栏 **Status Lights**（读状态、显示三盏灯） | VSIX 或本地安装 → `~/.cursor/extensions/` |
+| **A. Cursor 扩展** | 每台电脑 1 次 | 侧边栏 **Status Lights**（读状态、显示三盏灯） | VSIX → `~/.cursor/extensions/` |
 | **B. 全局 Hooks** | 每台电脑 1 次 | Agent 运行时**自动写状态** | `~/.cursor/hooks.json` + `~/.cursor/ai-traffic-lights/` |
 
 ```
 Cursor Agent 事件
   → ~/.cursor/hooks.json 调用 write-bridge-from-hook.mjs
   → ~/.cursor/ai-traffic-lights/states/<工作区ID>/state.json
-  → 扩展 fs.watch 读该文件 → 侧边栏变灯
+  → 扩展或桌面 App fs.watch 读该文件 → UI 变灯
 ```
 
 - **只装扩展、不装 Hooks** → 有侧边栏，但灯**不会**随 Agent 自动变（可用手动命令试灯）。
-- **只装 Hooks、不装扩展** → 状态文件会变，但**没有**侧边栏 UI。
+- **只装 Hooks、不装扩展** → 状态文件会变，但**没有**侧边栏 UI（可改用桌面浮窗 App）。
 - **每个打开的项目文件夹**有独立的 `state.json`（按路径 hash），多项目**不会串灯**。
+- **多 Agent 并行**时 UI 进入 Multi 模式（各灯可同亮并显示计数）；仅 1 个在管 Agent 时与旧版 Single 行为一致。
 
-需要 **Node.js ≥ 20**（仅安装/卸载 Hooks 时用，日常用 Cursor 不常驻 Node 进程）。
+Hook 安装需要 **Node.js ≥ 20**（仅安装/卸载时；日常用 Cursor 不常驻 Node 进程）。**桌面 App 首次启动会自动安装 Hooks**，一般无需手动执行 `install:global-hooks`。
 
 ---
 
@@ -43,11 +53,11 @@ Cursor Agent 事件
 
 ### 步骤 1：安装侧边栏扩展（VSIX）
 
-1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`ai-traffic-lights-cursor.vsix`**（请用 **v0.1.6**；v0.1.5 无 Multi Agent）
+1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`ai-traffic-lights-cursor.vsix`**（请用 **v0.1.6**）
 2. **若重装：** 先 `Cmd+Q` 完全退出 Cursor，再安装（避免 `Please restart VS Code before reinstalling`）
 3. Cursor → 命令面板（Mac `Cmd+Shift+P` / Windows `Ctrl+Shift+P`）→ **Extensions: Install from VSIX...** → 选择该文件  
    或 Cursor 关闭时：`"/Applications/Cursor.app/Contents/Resources/app/bin/cursor" --install-extension /path/to.vsix`
-4. Reload Window
+4. **Reload Window**
 
 ### 步骤 2：安装全局 Hooks
 
@@ -68,19 +78,21 @@ npm run install:global-hooks
 
 **不会**修改你的业务项目代码；状态写在用户目录，不污染各仓库。
 
+> **只装桌面 App？** 可跳过本步骤；App 首次启动会自动执行同等安装。详见下方「桌面悬浮 App」。
+
 ### 步骤 3：启用
 
 1. Cursor → **Reload Window**
 2. 用 Cursor 打开**任意项目的根目录**（不要只打开子文件夹）
 3. 打开 **Status Lights**（命令面板：`AI Traffic Lights: Show Status Lights`）
-4. 跑一轮 Agent → 应看到 **红灯（运行）→ 绿灯（结束）**
+4. 跑一轮 Agent → 应看到 **红灯（运行）→ 绿灯（结束）**；多 Agent 并行时见各灯计数
 
 **状态文件示例：**
 
 - macOS / Linux：`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
 - Windows：`%USERPROFILE%\.cursor\ai-traffic-lights\states\<workspace-id>\state.json`
 
-自检：Agent 跑完后打开该文件，`state` 应在 `RUNNING` / `DONE` 等之间变化，且 `workspaceRoot` 为**当前项目路径**（不能是 `.cursor` 用户目录本身）。
+自检：Agent 跑完后打开该文件，`state` 应在 `RUNNING` / `DONE` 等之间变化，且 `workspaceRoot` 为**当前项目路径**（不能是 `.cursor` 用户目录本身）。Multi 模式下另有 `displayMode`、`counts` 等字段。
 
 ---
 
@@ -135,7 +147,7 @@ npm run uninstall:cursor-extension
 ## 安装后检查清单
 
 - [ ] Extensions 里能看到 **AI Traffic Lights**，或命令面板能搜到相关命令
-- [ ] 已执行 `npm run install:global-hooks`，且存在 `~/.cursor/ai-traffic-lights/install-manifest.json`
+- [ ] 已执行 `npm run install:global-hooks`（或桌面 App 已自动安装），且存在 `~/.cursor/ai-traffic-lights/install-manifest.json`
 - [ ] `~/.cursor/hooks.json` 中含 `ai-traffic-lights` / `write-bridge-from-hook.mjs`
 - [ ] 当前窗口打开的是**项目根目录**
 - [ ] 已 **Reload Window**
@@ -149,7 +161,7 @@ npm run uninstall:cursor-extension
 
 ## 桌面悬浮 App（Mac · 独立产品）
 
-不装 VSIX 也可使用：always-on-top 三盏灯浮窗 + App 代装全局 Hook。
+不装 VSIX 也可使用：always-on-top 三盏灯浮窗；**首次启动自动安装全局 Hook**，无需 clone 仓库。
 
 ### 下载安装（Mac）
 
@@ -184,7 +196,7 @@ npm run uninstall:cursor-extension
 | `npm run package:extension` | 本地打 VSIX → `install/cursor/extension/` |
 | `install/cursor/workspace-hooks/bootstrap.sh <项目>` | **备用**：仅单个项目 Hook，不推荐日常使用 |
 
-目录说明：[install/](install/) · 开发接续：[docs/HANDOFF.md](docs/HANDOFF.md) · 桌面 App：[docs/desktop-app-status.md](docs/desktop-app-status.md)
+目录说明：[install/](install/) · 开发接续：[docs/HANDOFF.md](docs/HANDOFF.md) · 多 Agent 设计：[docs/multi-agent-design.md](docs/multi-agent-design.md)
 
 ---
 
@@ -193,6 +205,8 @@ npm run uninstall:cursor-extension
 | 能力 | 状态 |
 |------|------|
 | 红灯 `RUNNING` / 绿灯 `DONE` / 红闪 `ERROR` | ✅ 稳定 |
+| 单 Agent（Single 模式） | ✅ 与 v0.1.5 行为一致 |
+| 多 Agent 并行（Multi 计数） | ✅ v0.1.6 / desktop v0.1.2 |
 | 黄灯 `WAITING_USER`（AskQuestion） | ⚠️ 依赖 Cursor 信号，多数仍为红灯 |
 | Plan 红黄闪 `WAITING_PLAN_BUILD` | ⚠️ Plan Hook 难 latch，多数仍为红灯 |
 | 全局多项目 | ✅ 每工作区独立 `state.json` |
@@ -204,7 +218,7 @@ npm run uninstall:cursor-extension
 ## 性能与安全
 
 - Hook 仅在 Agent 事件时启动 **Node 子进程**；无 Agent 时 **零额外占用**。
-- 扩展只 **watch 当前工作区** 对应的一个 `state.json`，无轮询。
+- 扩展 / 桌面 App 只 **watch 当前工作区** 对应的一个 `state.json`，无轮询。
 - 状态文件仅写在 `~/.cursor/ai-traffic-lights/states/` 下，按工作区 hash 分子目录。
 
 ---
@@ -225,6 +239,7 @@ npm run install:cursor-extension:local   # 或 npm run package:extension
 | `npm run uninstall:cursor-extension` | 卸本机扩展目录 |
 | `npm run package:extension` | 构建 VSIX（上传 Release，不提交 git） |
 | `npm run build:desktop` | 构建 Mac `.dmg` / Windows `.exe`（Windows 需在 Windows 机构建） |
+| `npm run debug:multi:inspect` | 查看 Multi Agent bridge 状态（调试） |
 
 ---
 
@@ -232,7 +247,9 @@ npm run install:cursor-extension:local   # 或 npm run package:extension
 
 | 文档 | 内容 |
 |------|------|
-| [docs/HANDOFF.md](docs/HANDOFF.md) | 进度、架构细节、待办 |
+| [README.en.md](README.en.md) | 英文版说明（与本文对应） |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | **接续必读**：进度、架构、下一阶段待办 |
+| [docs/multi-agent-design.md](docs/multi-agent-design.md) | 多 Agent 设计规格（已实施） |
 | [docs/desktop-app-status.md](docs/desktop-app-status.md) | 桌面 App 功能与已知问题 |
 | [install/desktop/README.md](install/desktop/README.md) | Mac dmg 安装 / Windows 打 exe |
 | [docs/distribution.md](docs/distribution.md) | 与本文互补的分发说明 |
