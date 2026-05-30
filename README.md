@@ -1,25 +1,45 @@
 # AI Traffic Lights
 
-在 Cursor 侧边栏（及未来的桌面悬浮窗）用 **红 / 黄 / 绿** 三盏灯表示 AI Agent 状态：运行中、等待用户、已完成。
+在 Cursor 侧边栏用 **红 / 黄 / 绿** 三盏灯表示 Agent 状态：运行中、等待用户、已完成。
 
 **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
-**最新扩展包：** [GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)（`ai-traffic-lights-cursor.vsix`）
+**扩展包（VSIX）：** [GitHub Releases](https://github.com/JikerSun/sjk-traffic_lights/releases) → `ai-traffic-lights-cursor.vsix`
 
 ---
 
-## 安装（推荐：Release + 全局 Hook）
+## 工作原理（两层，缺一不可才能「自动变灯」）
 
-**每台 Mac 做两次（扩展 + Hooks），之后任意 Cursor 项目都能自动变灯。**
+| 层级 | 装几次 | 作用 | 装在哪 |
+|------|--------|------|--------|
+| **A. Cursor 扩展** | 每台电脑 1 次 | 侧边栏 **Status Lights**（读状态、显示三盏灯） | VSIX 或本地安装 → `~/.cursor/extensions/` |
+| **B. 全局 Hooks** | 每台电脑 1 次 | Agent 运行时**自动写状态** | `~/.cursor/hooks.json` + `~/.cursor/ai-traffic-lights/` |
 
-### 1. 安装侧边栏扩展（VSIX）
+```
+Cursor Agent 事件
+  → ~/.cursor/hooks.json 调用 write-bridge-from-hook.mjs
+  → ~/.cursor/ai-traffic-lights/states/<工作区ID>/state.json
+  → 扩展 fs.watch 读该文件 → 侧边栏变灯
+```
+
+- **只装扩展、不装 Hooks** → 有侧边栏，但灯**不会**随 Agent 自动变（可用手动命令试灯）。
+- **只装 Hooks、不装扩展** → 状态文件会变，但**没有**侧边栏 UI。
+- **每个打开的项目文件夹**有独立的 `state.json`（按路径 hash），多项目**不会串灯**。
+
+需要 **Node.js ≥ 20**（仅安装/卸载 Hooks 时用，日常用 Cursor 不常驻 Node 进程）。
+
+---
+
+## 安装（推荐：Release VSIX + 全局 Hook）
+
+### 步骤 1：安装侧边栏扩展（VSIX）
 
 1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载最新 **`ai-traffic-lights-cursor.vsix`**
 2. Cursor → `Cmd+Shift+P` → **Extensions: Install from VSIX...** → 选择该文件
-3. 安装完成后先 **Reload Window**（最后与 Hook 一起 Reload 也可）
+3. 若曾装过旧版：先在 **Extensions** 里卸载 **AI Traffic Lights**，再装新 VSIX
 
-> 若已装过旧版，可先卸载 **AI Traffic Lights** 再装新 VSIX。
+### 步骤 2：安装全局 Hooks
 
-### 2. 安装全局 Hooks（所有项目自动写状态）
+**需要 clone 本仓库一次**（Hooks 安装脚本在仓库里；VSIX 本身不含 Hooks）。
 
 ```bash
 git clone https://github.com/JikerSun/sjk-traffic_lights.git
@@ -28,71 +48,123 @@ npm install
 npm run install:global-hooks
 ```
 
-会写入 `~/.cursor/hooks.json` 与 `~/.cursor/ai-traffic-lights/`（按工作区隔离的 `state.json`）。
+脚本会：
 
-### 3. 使用
+- 复制 Hook 脚本到 `~/.cursor/ai-traffic-lights/hooks/`、`lib/`
+- **合并** `~/.cursor/hooks.json`（若已有其它 Hook，只追加本工具条目；安装前自动备份为 `hooks.json.bak.ai-traffic-lights.<时间戳>`）
+- 写入 `~/.cursor/ai-traffic-lights/install-manifest.json`（供卸载脚本识别）
 
-1. **Reload Window**
-2. 用 Cursor 打开**任意项目根目录**
-3. 打开视图 **Status Lights**（或命令面板 `AI Traffic Lights: Show Status Lights`）
-4. 跑一轮 Agent，红灯 → 绿灯应随状态变化
+**不会**修改你的业务项目代码；状态写在用户目录，不污染各仓库。
 
-状态文件路径：`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+### 步骤 3：启用
 
-### 卸载
+1. Cursor → **Reload Window**
+2. 用 Cursor 打开**任意项目的根目录**（不要只打开子文件夹）
+3. 打开 **Status Lights**（命令面板：`AI Traffic Lights: Show Status Lights`）
+4. 跑一轮 Agent → 应看到 **红灯（运行）→ 绿灯（结束）**
+
+**状态文件示例：**
+
+`~/.cursor/ai-traffic-lights/states/<workspace-id>/state.json`
+
+自检：Agent 跑完后打开该文件，`state` 应在 `RUNNING` / `DONE` 等之间变化，且 `workspaceRoot` 为**当前项目路径**（不能是 `~/.cursor`）。
+
+---
+
+## 卸载（彻底）
+
+扩展与 Hooks 是**两套东西**，建议都卸干净。最后 **Reload Window**。
+
+### 方式 A：已 clone 过仓库（推荐）
+
+在 `sjk-traffic_lights` 目录下：
 
 ```bash
-cd sjk-traffic_lights   # 已 clone 的目录
+# 1. 卸全局 Hooks + 桥接数据
 npm run uninstall:global-hooks
+
+# 2. 卸扩展（删 ~/.cursor/extensions/local.ai-traffic-lights-cursor-extension-*）
 npm run uninstall:cursor-extension
 ```
 
-或在 Cursor **Extensions** 里卸载 **AI Traffic Lights**，再 Reload。详见 [docs/distribution.md](docs/distribution.md)。
+`uninstall:global-hooks` 会：
+
+- 删除整个 `~/.cursor/ai-traffic-lights/`（含各工作区 `states/`）
+- 从 `~/.cursor/hooks.json` **移除**本工具相关 command（保留你其它 Hook）
+- 若合并后 `hooks.json` 为空，会删除该文件
+
+然后 **Reload Window**。
+
+### 方式 B：只装过 VSIX、未 clone 仓库
+
+| 要卸什么 | 怎么做 |
+|----------|--------|
+| **扩展（VSIX）** | Cursor → **Extensions** → **AI Traffic Lights** → **Uninstall** → Reload |
+| **全局 Hooks** | 须 **clone 仓库** 后执行 `npm install && npm run uninstall:global-hooks`（同方式 A 第 1 步） |
+
+仅卸扩展、不卸 Hooks：侧边栏没了，但 Agent 仍可能触发 Hook 写文件（无 UI、几乎无性能影响）。要彻底干净请卸 Hooks。
+
+### 可选：曾用「单项目 bootstrap」装过 Hook
+
+在每个装过的项目根目录，手动删除（若存在）：
+
+- `.cursor/hooks.json` 里与本工具相关的 command
+- `.cursor/hooks/write-bridge-from-hook.mjs`
+- `scripts/lib/` 下 bridge 相关 `.mjs`
+- `.ai-traffic-lights/`（运行时目录）
+
+全局 Hook 已装时，项目内旧 Hook 会自动跳过，但删除上述文件可避免混淆。
+
+**说明：** 无后台常驻服务；卸载后不占 CPU/内存。漏删的 `state.json` 只是磁盘上的小 JSON，不是内存泄漏。
+
+---
+
+## 安装后检查清单
+
+- [ ] Extensions 里能看到 **AI Traffic Lights**，或命令面板能搜到相关命令
+- [ ] 已执行 `npm run install:global-hooks`，且存在 `~/.cursor/ai-traffic-lights/install-manifest.json`
+- [ ] `~/.cursor/hooks.json` 中含 `ai-traffic-lights` / `write-bridge-from-hook.mjs`
+- [ ] 当前窗口打开的是**项目根目录**
+- [ ] 已 **Reload Window**
+- [ ] Agent 跑一轮后，对应 `states/.../state.json` 里 `state` 会变化
+
+**手动试灯（不跑 Agent）：** `Cmd+Shift+P` → `AI Traffic Lights: Set Running` / `Set Done`
+
+**仍不变灯时：** Output 面板 → 选 **Hooks** 看报错；确认 `state.json` 里 `workspaceRoot` 是否为当前项目路径。
 
 ---
 
 ## 其它安装方式
 
-| 方式 | 适用 |
+| 方式 | 说明 |
 |------|------|
-| [Releases VSIX](https://github.com/JikerSun/sjk-traffic_lights/releases) + 上表 Hook | **推荐给同事** |
-| `npm run install:cursor-extension:local` | 本机从源码装扩展（开发者） |
+| [Releases VSIX](https://github.com/JikerSun/sjk-traffic_lights/releases) + `install:global-hooks` | **推荐给同事** |
+| `npm run install:cursor-extension:local` | 开发者从源码装扩展（非 VSIX） |
 | `npm run package:extension` | 本地打 VSIX → `install/cursor/extension/` |
-| `install/cursor/workspace-hooks/bootstrap.sh` | 备用：仅单个项目 Hook（不推荐） |
+| `install/cursor/workspace-hooks/bootstrap.sh <项目>` | **备用**：仅单个项目 Hook，不推荐日常使用 |
 
-目录说明见 **[`install/`](install/)**；接续开发读 **[`docs/HANDOFF.md`](docs/HANDOFF.md)**。
-
----
-
-## 当前已实现的功能
-
-| 能力 | 状态 | 说明 |
-|------|------|------|
-| 红灯 `RUNNING` | ✅ 稳定 | Agent 执行中 |
-| 绿灯 `DONE` | ✅ 稳定 | `stop(completed)` 后变绿 |
-| 红灯闪烁 `ERROR` | ✅ 稳定 | 异常 / 中止等 |
-| 黄灯 `WAITING_USER` | ⚠️ 受限 | AskQuestion 信号常不可靠 |
-| Plan 红黄闪 `WAITING_PLAN_BUILD` | ⚠️ 受限 | Plan Hook 难 latch |
-| 全局多项目 Hooks | ✅ | `~/.cursor/ai-traffic-lights/states/<id>/` |
-| 手动调试命令 | ✅ | `AI Traffic Lights: Set …` |
-| 桌面悬浮窗 | 🚧 脚手架 | `products/desktop-overlay/` |
-
-逻辑与限制：[docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md)
+目录说明：[install/](install/) · 开发接续：[docs/HANDOFF.md](docs/HANDOFF.md)
 
 ---
 
-## 仓库目录结构
+## 功能与限制
 
-```
-sjk-traffic_lights/
-├── install/cursor/
-│   ├── extension/       # 本地 build 的 VSIX 输出目录
-│   └── global-hooks/    # 全局 Hook 说明
-├── products/cursor-extension/
-├── scripts/lib/         # Hook 逻辑（安装时复制到 ~/.cursor/ai-traffic-lights/lib）
-├── tools/               # install:global-hooks、package:extension 等
-└── docs/
-```
+| 能力 | 状态 |
+|------|------|
+| 红灯 `RUNNING` / 绿灯 `DONE` / 红闪 `ERROR` | ✅ 稳定 |
+| 黄灯 `WAITING_USER`（AskQuestion） | ⚠️ 依赖 Cursor 信号，多数仍为红灯 |
+| Plan 红黄闪 `WAITING_PLAN_BUILD` | ⚠️ Plan Hook 难 latch，多数仍为红灯 |
+| 全局多项目 | ✅ 每工作区独立 `state.json` |
+
+详情：[docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md)
+
+---
+
+## 性能与安全
+
+- Hook 仅在 Agent 事件时启动 **Node 子进程**；无 Agent 时 **零额外占用**。
+- 扩展只 **watch 当前工作区** 对应的一个 `state.json`，无轮询。
+- 状态文件仅写在 `~/.cursor/ai-traffic-lights/states/` 下，按工作区 hash 分子目录。
 
 ---
 
@@ -102,15 +174,15 @@ sjk-traffic_lights/
 git clone https://github.com/JikerSun/sjk-traffic_lights.git
 cd sjk-traffic_lights && npm install && npm run build
 npm run install:global-hooks
-npm run install:cursor-extension:local
-# 或发版：npm run package:extension
+npm run install:cursor-extension:local   # 或 npm run package:extension
 ```
 
 | 命令 | 作用 |
 |------|------|
-| `npm run package:extension` | 生成 VSIX → `install/cursor/extension/` |
-| `npm run install:global-hooks` | 用户目录 Hooks |
-| `npm run uninstall:global-hooks` | 卸 Hooks + 桥接数据 |
+| `npm run install:global-hooks` | 安装用户目录 Hooks |
+| `npm run uninstall:global-hooks` | 卸 Hooks + `~/.cursor/ai-traffic-lights/` |
+| `npm run uninstall:cursor-extension` | 卸本机扩展目录 |
+| `npm run package:extension` | 构建 VSIX（上传 Release，不提交 git） |
 
 ---
 
@@ -118,12 +190,12 @@ npm run install:cursor-extension:local
 
 | 文档 | 内容 |
 |------|------|
-| [docs/HANDOFF.md](docs/HANDOFF.md) | 进度、逻辑、待办 |
-| [docs/distribution.md](docs/distribution.md) | 安装 / 卸载详情 |
-| [docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md) | 运行时与限制 |
+| [docs/HANDOFF.md](docs/HANDOFF.md) | 进度、架构细节、待办 |
+| [docs/distribution.md](docs/distribution.md) | 与本文互补的分发说明 |
+| [docs/traffic-lights-runtime.md](docs/traffic-lights-runtime.md) | 运行时逻辑与版本说明 |
 
 ---
 
 ## 许可与贡献
 
-勿将 `.ai-traffic-lights/` 运行时、`*.vsix` 提交进 git（见 `.gitignore`）；VSIX 通过 **Releases** 分发。
+VSIX 通过 **Releases** 分发，不提交进 git（见 `.gitignore`）。勿提交各项目 `.ai-traffic-lights/` 运行时文件。
