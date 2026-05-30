@@ -1,6 +1,6 @@
 # Desktop Overlay (Tauri)
 
-**v0.1.0** — Mac Apple Silicon dmg 可装；Setup 启动向导 + Settings 菜单运行期切换
+**v0.1.1** — Mac Apple Silicon dmg 可装；Setup 启动向导 + Settings 菜单运行期切换
 
 ## 用户安装（Mac）
 

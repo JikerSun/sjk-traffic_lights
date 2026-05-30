@@ -1,6 +1,6 @@
 [package]
 name = "ai-traffic-lights-desktop"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI Traffic Lights desktop overlay for Cursor"
 authors = ["JikerSun"]
 edition = "2021"

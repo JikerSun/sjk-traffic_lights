@@ -52,12 +52,13 @@ impl AppRuntime {
         })
     }
 
-    pub fn ensure_hooks_on_first_run(&mut self, app: &AppHandle) -> Result<(), String> {
+    pub fn ensure_hooks_on_first_run(&mut self, app: &AppHandle) {
         if hooks::is_installed() {
-            return Ok(());
+            return;
         }
-        hooks::install_global_hooks(app)?;
-        Ok(())
+        if let Err(err) = hooks::install_global_hooks(app) {
+            eprintln!("[AI Traffic Lights] Hook auto-install skipped: {err}");
+        }
     }
 
     pub fn bind_window(&mut self, app: &AppHandle, window_id: u32) -> Result<DesktopConfig, String> {

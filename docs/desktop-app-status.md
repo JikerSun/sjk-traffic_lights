@@ -1,7 +1,7 @@
 # 桌面悬浮 App — 实现状态与已知问题
 
 > **最后更新：** 2026-05-30  
-> **版本：** desktop **v0.1.0**（`products/desktop-overlay/package.json` / `tauri.conf.json`）  
+> **版本：** desktop **v0.1.1**（`products/desktop-overlay/package.json` / `tauri.conf.json`）  
 > **接续：** 下次改 App 先读 **本文件 → [HANDOFF.md](HANDOFF.md) §0 → [desktop-app-requirements.md](desktop-app-requirements.md)**
 
 ---
@@ -56,7 +56,8 @@ AI Traffic Lights
 
 - 首次启动：`AppRuntime::ensure_hooks_on_first_run` → `hooks::install_global_hooks`
 - 资源：`src-tauri/resources/hook-kit/`（`npm run sync:hook-kit` 同步）
-- Node：优先系统 Node ≥20，否则报错（**内置 Node 尚未打包**）
+- Node：优先 `which node`，再探测 `/opt/homebrew/bin`、`/usr/local/bin` 等；Finder 启动也会查找。**内置 Node 尚未打包**
+- 首次 Hook 安装失败 **不再崩溃**；可在 Preferences 手动安装
 
 ### 2.5 卸载（Preferences）
 
@@ -84,8 +85,8 @@ npm run build:desktop
 | # | 问题 | 严重度 | 说明 |
 |---|------|--------|------|
 | 1 | **Windows 窗口枚举未实现** | 🔴 | `platform_windows.rs` 为 stub；Windows 上无法绑窗/吸附 |
-| 2 | **内置 Node 未随包分发** | 🟡 | 无 Node≥20 时 Hook 安装/卸载命令会失败 |
-| 3 | **未签名 / 未公证** | 🟡 | 首次打开需「仍要打开」；未 Apple Notarize |
+| 2 | **内置 Node 未随包分发** | 🟡 | 无 Node≥20 时 Preferences 内 Hook 安装会失败；App 不再因此闪退 |
+| 3 | **未签名 / 未公证** | 🟡 | 下载后执行 `xattr -cr`；或「仍要打开」；未 Apple Notarize |
 | 4 | **仅 aarch64 dmg 在本机验证** | 🟡 | Intel Mac 需 `--target x86_64-apple-darwin` 另打 |
 | 5 | **菜单 Uninstall Global Hooks** | 🟡 | 仍是一键卸 Hook（无确认），与 Preferences 完整卸载说明不一致 |
 | 6 | **拖 App 到废纸篓不会自动卸 Hook** | 🟡 | 需求 Q3「卸 App 同步卸 Hook」未做系统级钩子；靠 Preferences 弹窗引导 |

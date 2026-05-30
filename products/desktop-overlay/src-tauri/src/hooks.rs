@@ -1,4 +1,5 @@
-use std::path::PathBuf;
+use std::collections::HashSet;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use tauri::{AppHandle, Manager};
@@ -10,32 +11,58 @@ pub fn is_installed() -> bool {
     manifest.exists()
 }
 
+fn try_node_at(path: &Path) -> Option<PathBuf> {
+    if !path.is_file() {
+        return None;
+    }
+    let output = Command::new(path).arg("--version").output().ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let version = String::from_utf8_lossy(&output.stdout);
+    if node_version_ok(&version) {
+        Some(path.to_path_buf())
+    } else {
+        None
+    }
+}
+
+/// Resolve an absolute path to Node ≥20. Finder-launched apps have a minimal PATH,
+/// so we probe common install locations after `which node`.
 pub fn resolve_node(app: &AppHandle) -> Result<PathBuf, String> {
-    if let Ok(output) = Command::new("node").arg("--version").output() {
+    let mut candidates: Vec<PathBuf> = Vec::new();
+
+    if let Ok(output) = Command::new("which").arg("node").output() {
         if output.status.success() {
-            let version = String::from_utf8_lossy(&output.stdout);
-            if node_version_ok(&version) {
-                if let Ok(which) = Command::new("which").arg("node").output() {
-                    if which.status.success() {
-                        let path = String::from_utf8_lossy(&which.stdout).trim().to_string();
-                        if !path.is_empty() {
-                            return Ok(PathBuf::from(path));
-                        }
-                    }
-                }
-                return Ok(PathBuf::from("node"));
+            let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            if !path.is_empty() {
+                candidates.push(PathBuf::from(path));
             }
         }
     }
 
+    candidates.push(PathBuf::from("/opt/homebrew/bin/node"));
+    candidates.push(PathBuf::from("/usr/local/bin/node"));
+    if let Some(home) = dirs::home_dir() {
+        candidates.push(home.join(".fnm/current/bin/node"));
+        candidates.push(home.join(".volta/bin/node"));
+    }
+
     let resource = app.path().resource_dir().map_err(|e| e.to_string())?;
-    let bundled = resource.join("node").join("bin").join("node");
-    if bundled.exists() {
-        return Ok(bundled);
+    candidates.push(resource.join("node").join("bin").join("node"));
+
+    let mut seen = HashSet::new();
+    for path in candidates {
+        if !seen.insert(path.clone()) {
+            continue;
+        }
+        if let Some(ok) = try_node_at(&path) {
+            return Ok(ok);
+        }
     }
 
     Err(
-        "需要 Node.js 20 或更高版本。请安装 Node 后重试，或使用包含 Node 的安装包。".to_string(),
+        "需要 Node.js 20 或更高版本。请安装 Node 后重试，或在 Preferences 中手动安装 Hook。".to_string(),
     )
 }
 

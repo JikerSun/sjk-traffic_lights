@@ -16,12 +16,28 @@
 ### 方式 1：GitHub Releases（推荐给同事）
 
 1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**
-2. 找到标签 **`desktop-v0.1.0`**（或最新 `desktop-v*`）
-3. 下载 **`AI Traffic Lights_0.1.0_aarch64.dmg`**（Apple Silicon / M 系列）
+2. 找到标签 **`desktop-v0.1.1`**（或最新 `desktop-v*`）
+3. 下载 **`AI Traffic Lights_0.1.1_aarch64.dmg`**（Apple Silicon / M 系列）
 4. 双击 dmg → 将 **AI Traffic Lights** 拖到 **Applications**
-5. 首次打开若被拦截：**系统设置 → 隐私与安全性 → 仍要打开**（当前包未公证）
-6. 启动后出现 **Setup** 英文向导 → 选 IDE + Cursor 窗口 → **Continue**
-7. 跑 Cursor Agent → 浮窗红 / 绿应随 `state.json` 变化
+5. **去掉下载隔离**（浏览器下载后常需要；若提示「已损坏」也先执行此步）：
+
+```bash
+xattr -cr "/Applications/AI Traffic Lights.app"
+```
+
+6. 双击打开 App（若仍被拦截：**系统设置 → 隐私与安全性 → 仍要打开**；当前包未公证）
+7. 启动后出现 **Setup** 英文向导 → 选 IDE + Cursor 窗口 → **Continue**
+8. 需要 **Node.js ≥ 20**（Hook 安装/卸载；App 会自动查找 Homebrew 等常见路径）
+9. 跑 Cursor Agent → 浮窗红 / 绿应随 `state.json` 变化
+
+**若双击后「意外退出」：** 多为首次 Hook 安装失败。在终端执行一次（会显示具体错误）：
+
+```bash
+xattr -cr "/Applications/AI Traffic Lights.app"
+"/Applications/AI Traffic Lights.app/Contents/MacOS/ai-traffic-lights-desktop"
+```
+
+Hook 装成功后，之后可直接双击打开。
 
 **Intel Mac：** Release 若只有 `aarch64`，需维护者另传 `x86_64` dmg，或自行源码构建（见下方 B）。
 
@@ -38,7 +54,7 @@ npm run build:desktop
 
 | 文件 | 路径 |
 |------|------|
-| **dmg** | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.0_aarch64.dmg` |
+| **dmg** | `products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg` |
 | **.app** | `products/desktop-overlay/src-tauri/target/release/bundle/macos/AI Traffic Lights.app` |
 
 可选复制到本目录方便分发：
@@ -78,10 +94,10 @@ AI_TL_KIT_ROOT="/Applications/AI Traffic Lights.app/Contents/Resources/hook-kit"
 npm run build:desktop
 
 # 使用 GitHub CLI（需 gh auth login）
-gh release create desktop-v0.1.0 \
-  --title "Desktop App v0.1.0 (Mac)" \
-  --notes "Mac Apple Silicon dmg. Setup wizard + menu Settings. See install/desktop/README.md." \
-  "products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.0_aarch64.dmg"
+gh release create desktop-v0.1.1 \
+  --title "Desktop App v0.1.1 (Mac)" \
+  --notes "Fix Finder launch crash; xattr step in install/desktop/README.md." \
+  "products/desktop-overlay/src-tauri/target/release/bundle/dmg/AI Traffic Lights_0.1.1_aarch64.dmg"
 ```
 
 或在 GitHub 网页：**Releases → Draft a new release → 上传 dmg 附件**。

@@ -162,7 +162,7 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             let mut rt = AppRuntime::new()?;
-            rt.ensure_hooks_on_first_run(&handle)?;
+            rt.ensure_hooks_on_first_run(&handle);
 
             // Launch setup window handles IDE/window choice each app start.
             // Runtime switching uses the menu bar Settings submenu.
