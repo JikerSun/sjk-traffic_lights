@@ -29,6 +29,8 @@ export function agentIdFrom(payload) {
   const explicit =
     payload?.subagent_id ||
     payload?.subagentId ||
+    payload?.agent_id ||
+    payload?.agentId ||
     payload?.agent_run_id ||
     payload?.agentRunId ||
     payload?.background_agent_id ||
@@ -383,9 +385,9 @@ export function countsEqual(a, b) {
  * @param {Record<string, unknown>} base
  * @param {{ workspaceStateId?: string, workspaceRoot?: string }} workspaceMeta
  */
-export function buildSingleDocument(base, workspaceMeta) {
+export function buildSingleDocument(base, workspaceMeta, toolName = "cursor") {
   return {
-    tool: "cursor",
+    tool: toolName,
     sessionId: base.sessionId,
     state: base.state,
     reason: base.reason,
@@ -401,9 +403,9 @@ export function buildSingleDocument(base, workspaceMeta) {
  * @param {{ running: number, waiting: number, done: number, error: number, plan: number }} counts
  * @param {{ workspaceStateId?: string, workspaceRoot?: string }} workspaceMeta
  */
-export function buildMultiDocument(base, agents, counts, workspaceMeta) {
+export function buildMultiDocument(base, agents, counts, workspaceMeta, toolName = "cursor") {
   return {
-    tool: "cursor",
+    tool: toolName,
     sessionId: base.sessionId,
     state: aggregateTopLevelState(counts),
     reason: base.reason,

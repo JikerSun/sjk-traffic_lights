@@ -21,6 +21,7 @@
 | **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.2 已发** | Multi Agent 浮窗 · [desktop-v0.1.2](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.2) |
 | **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单；Preferences 卸载步骤弹窗 |
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
+| **Phase 4 — Codex 适配** | 🚧 **Phase 0** | App 用户 + 浮窗 · Hook recon · [codex-adapter.md](codex-adapter.md) |
 | **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 见 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 黄灯 / Plan 红黄闪 | ⏸ **冻结** | Cursor Hook 信号不足；用户未说「修 Plan 灯」不改 |
 | 多 Agent | ✅ **已实施** | [multi-agent-design.md](multi-agent-design.md) · 共享 core：`libs/protocol` + `libs/core` |
@@ -207,6 +208,7 @@ npm run bridge:watch                   # 可选
 
 **近期（按优先级）**
 
+0. **Codex Phase 0→1** — recon log → 定稿 `codex-bridge-resolve` · [codex-adapter.md](codex-adapter.md)  
 1. **Windows VSIX 同事实测** — v0.1.6；文档 [README.md](../README.md) / [README.en.md](../README.en.md)
 2. **Windows 桌面 App** — 补 `platform_windows.rs` + Windows 机 `npm run build:desktop` → `.exe`（[install/desktop/README.md](../install/desktop/README.md) §C）
 3. **Mac 分发体验** — Developer ID 签名 + 公证（减少 `xattr`）；或维持文档引导
@@ -251,7 +253,7 @@ npm run bridge:watch                   # 可选
 | [desktop-app-requirements.md](desktop-app-requirements.md) | 桌面 App 需求 + 多 Agent 备忘 |
 | [desktop-app-testing-mac.md](desktop-app-testing-mac.md) | Mac 桌面 App 测试步骤 |
 | [mobile-sync-plan.md](mobile-sync-plan.md) | **Phase 5 手机同步（暂缓）** |
-| [multi-agent-design.md](multi-agent-design.md) | **Phase 3.x 多 Agent 设计** |
+| [codex-adapter.md](codex-adapter.md) | **Codex 适配规格 + 待核对清单** |
 | [install/desktop/README.md](../install/desktop/README.md) | **Mac dmg 安装 / 发 Release / Windows 打 exe** |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期计划、历史测试记录 §9–11 |
 | [README.md](../README.md) | 对外入口（中文） |

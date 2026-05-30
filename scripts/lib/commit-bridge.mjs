@@ -59,7 +59,8 @@ async function writeBridgeFiles(bridgePath, overlayBridgePath, mirrorOverlay, do
  *   mapped: { state: string, reason?: string, source?: string },
  *   eventName: string,
  *   forceWrite?: boolean,
- *   allowSingleWrite?: boolean
+ *   allowSingleWrite?: boolean,
+ *   toolName?: string
  * }} options
  * @returns {Promise<{ wrote: boolean, document?: Record<string, unknown> }>}
  */
@@ -74,7 +75,8 @@ export async function commitBridgeUpdate(options) {
     mapped,
     eventName,
     forceWrite = false,
-    allowSingleWrite = true
+    allowSingleWrite = true,
+    toolName = "cursor"
   } = options;
 
   const conversationId = conversationIdFrom(hookPayload);
@@ -94,7 +96,7 @@ export async function commitBridgeUpdate(options) {
     const previous = await readBridgeDocument(bridgePath);
 
     if (!conversationId || !agentId) {
-      const document = buildSingleDocument(base, workspaceMeta);
+      const document = buildSingleDocument(base, workspaceMeta, toolName);
       if (!allowSingleWrite && !forceWrite) {
         return { wrote: false };
       }
@@ -125,7 +127,7 @@ export async function commitBridgeUpdate(options) {
         source: sole?.source ?? mapped.source,
         ts: now
       };
-      const document = buildSingleDocument(singleBase, workspaceMeta);
+      const document = buildSingleDocument(singleBase, workspaceMeta, toolName);
       if (!allowSingleWrite && !forceWrite) {
         return { wrote: false };
       }
@@ -138,7 +140,7 @@ export async function commitBridgeUpdate(options) {
 
     const counts = computeCounts(agents);
     debugMulti(`${eventName}:write`, agentId, agents, counts, mapped, "multi");
-    const document = buildMultiDocument(base, agents, counts, workspaceMeta);
+    const document = buildMultiDocument(base, agents, counts, workspaceMeta, toolName);
     if (!forceWrite && !shouldWriteBridgeDocument(previous, document)) {
       return { wrote: false };
     }

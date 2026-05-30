@@ -5,7 +5,7 @@
 | 目录 | 工具 | 状态 |
 |------|------|------|
 | [cursor/](../cursor/extension/) | Cursor 侧边栏扩展 | 可用（VSIX） |
-| [codex/](codex/) | Codex CLI / 适配器 | 预留 |
+| [codex/](codex/) | Codex Hooks + VSIX（Phase 0 侦察中） | 🚧 |
 | _更多渠道_ | 后续按 `libs/adapters` 扩展 | — |
 
 开发中的共享逻辑：`libs/adapters`、`libs/core`、`libs/protocol`。

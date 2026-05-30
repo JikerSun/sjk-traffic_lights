@@ -1,0 +1,82 @@
+{
+  "name": "ai-traffic-lights-codex-extension",
+  "displayName": "AI Traffic Lights (Codex)",
+  "version": "0.1.0",
+  "publisher": "local",
+  "description": "Traffic light status indicator for Codex Agent workflow (reads ~/.codex/ai-traffic-lights/).",
+  "categories": [
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onView:aiTrafficLightsCodex.sidebar",
+    "onStartupFinished",
+    "onCommand:aiTrafficLightsCodex.setRunning",
+    "onCommand:aiTrafficLightsCodex.setWaiting",
+    "onCommand:aiTrafficLightsCodex.setDone",
+    "onCommand:aiTrafficLightsCodex.setIdle",
+    "onCommand:aiTrafficLightsCodex.setPlanWaiting",
+    "onCommand:aiTrafficLightsCodex.setError",
+    "onCommand:aiTrafficLightsCodex.openBridgeFile",
+    "onCommand:aiTrafficLightsCodex.showStatusLights"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "aiTrafficLightsCodex.sidebar",
+          "name": "Codex Status Lights",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "aiTrafficLightsCodex.setRunning",
+        "title": "AI Traffic Lights (Codex): Set Running"
+      },
+      {
+        "command": "aiTrafficLightsCodex.setWaiting",
+        "title": "AI Traffic Lights (Codex): Set Waiting User"
+      },
+      {
+        "command": "aiTrafficLightsCodex.setDone",
+        "title": "AI Traffic Lights (Codex): Set Done"
+      },
+      {
+        "command": "aiTrafficLightsCodex.setIdle",
+        "title": "AI Traffic Lights (Codex): Set Idle"
+      },
+      {
+        "command": "aiTrafficLightsCodex.setPlanWaiting",
+        "title": "AI Traffic Lights (Codex): Set Plan Waiting (Build)"
+      },
+      {
+        "command": "aiTrafficLightsCodex.setError",
+        "title": "AI Traffic Lights (Codex): Set Error"
+      },
+      {
+        "command": "aiTrafficLightsCodex.openBridgeFile",
+        "title": "AI Traffic Lights (Codex): Open Bridge State File"
+      },
+      {
+        "command": "aiTrafficLightsCodex.showStatusLights",
+        "title": "AI Traffic Lights (Codex): Show Status Lights"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "package": "vsce package --out ../../install/plugins/codex/ai-traffic-lights-codex.vsix --allow-missing-repository --skip-license --allow-package-all-secrets"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@vscode/vsce": "^3.9.1",
+    "@types/node": "^20.14.9",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  }
+}
