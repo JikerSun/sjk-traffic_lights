@@ -150,6 +150,7 @@ Blink rule (initial default):
 | 3 | Desktop Overlay MVP | 🟡 **Mac v0.1.1 可装**；Windows stub；见 [desktop-app-status.md](docs/desktop-app-status.md) |
 | 4 | Hardening + GitHub Ready | 🟡 Partial（Release dmg、global hooks、文档）；签名/CI TBD |
 | 5 | Mobile sync (LAN PWA / push) | 📋 **Deferred** — [mobile-sync-plan.md](docs/mobile-sync-plan.md) |
+| 3.x | Multi-Agent count UI | 📋 **Specced** — [multi-agent-design.md](docs/multi-agent-design.md); Single regression gate |
 
 ## Phase 0 - Bootstrap + Docs
 
@@ -362,9 +363,10 @@ Feedback sent via **Help → Send Feedback** (Bug) describing the above.
 2. **Windows desktop App** — implement `platform_windows.rs`; build `.exe` on Windows ([install/desktop/README.md](install/desktop/README.md) §C).
 3. **Bundled Node** in desktop App resources.
 4. **Windows VSIX smoke test** — colleagues install v0.1.5 + `install:global-hooks`.
-5. **Phase 5 mobile sync** — **deferred**; see [mobile-sync-plan.md](docs/mobile-sync-plan.md).
-6. **Revisit yellow / Plan** only when Cursor API improves or user says **「修 Plan 灯」** (see §9).
-7. Keep **Codex adapter** deferred until desktop MVP is stable on Mac + Windows.
+5. **Phase 3.x multi-agent** — spike then `scripts/lib/`; **Single regression before Multi UI** — [multi-agent-design.md](docs/multi-agent-design.md).
+6. **Phase 5 mobile sync** — **deferred**; see [mobile-sync-plan.md](docs/mobile-sync-plan.md).
+7. **Revisit yellow / Plan** only when Cursor API improves or user says **「修 Plan 灯」** (see §9).
+8. Keep **Codex adapter** deferred until desktop MVP is stable on Mac + Windows.
 
 ## 11) Handoff Notes For Next Session
 

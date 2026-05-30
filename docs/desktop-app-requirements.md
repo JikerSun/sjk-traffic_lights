@@ -1,6 +1,6 @@
 # 桌面 App 需求与备忘（Phase 3+）
 
-> **最后更新：** 2026-05-29（Phase 3.1：窗口/恢复吸附移入菜单栏）  
+> **最后更新：** 2026-05-30（Phase 3.x 多 Agent 设计规格 · 见 [multi-agent-design.md](multi-agent-design.md)）  
 > **产品定位：** **独立产品**（不依赖 VSIX；Hook 由 App 首次启动/安装时代装）  
 > **开发约束：** 不得修改 `products/cursor-extension/` 及已验收的 Hook 映射逻辑（`scripts/lib/` 等）；桌面侧仅**复用/拷贝**现有 bridge 与 hook 脚本，或通过 App 安装器调用同等逻辑。
 
@@ -142,18 +142,38 @@ App 本体（Tauri）不依赖用户单独安装 Node。
 
 ---
 
-## 2. 后期备忘 — 多 Agent 检测（未实施）
+## 2. 多 Agent 检测与计数 UI（Phase 3.x · 未实施）
 
-> **扫描提醒：** 后续版本需支持 **同一工作区多 Agent 并行** 时的状态展示策略（非 Phase 3 MVP）。
+> **完整规格：** [multi-agent-design.md](multi-agent-design.md)（**实施前必读**）  
+> **原则：** **Single Agent 行为零回归**；Multi 仅在 `N_active ≥ 2` 时启用。
 
-待产品定义（实现前必须拍板）：
+### 2.1 产品摘要
 
-1. **聚合规则：** 多 Agent 同时 RUNNING → 是否仍示红灯？是否有「任一 WAITING → 黄灯」优先级？
-2. **标识来源：** Cursor Hook payload 是否稳定提供 `conversation_id` / `generation_id` / 并行 session 区分字段 — **需实测**。
-3. **UI：** 单组三灯聚合 vs 多组灯 vs 数字角标 — 未定。
-4. **Bridge 格式：** 当前 `state.json` 为单状态；多 Agent 可能需 `states[]` 或 per-agent 子文件 — **协议扩展**，与插件共用 bridge 时需兼容只读旧格式。
+| 模式 | 条件 | UI |
+|------|------|-----|
+| **Single** | Active Set 中 **≤1** 个在管 Agent | **与现版一致**，无数字 |
+| **Multi** | **≥2** 个在管 Agent | 各灯可同时亮；亮灯显示 **该状态下 Agent 数量**（数字色与灯色接近但可区分） |
 
-**Phase 3 不做多 Agent**；本段仅防止后续会话遗漏需求。
+- **在管 Agent** = 有 Hook 的 `conversation_id`，**不是** Cursor 列表全长（历史未用的 **不记录**）。  
+- 文中举例的个数（如 10/8/5/3）**仅为说明**，实现用 `T_done` / `T_stale` / `MAX_ACTIVE` 等 **可配置常量**。  
+- DONE 在宽限 `T_done` 内仍算 Active（绿灯计数）；过期 prune。
+
+### 2.2 非功能（必达）
+
+| 维度 | 要求 |
+|------|------|
+| **性能** | Single 快路径；`counts` 不变不写盘；Multi debounce；无 state 轮询 |
+| **内存/文件** | 单文件 **覆盖写**；`agents` **必须 prune**；大小有上界（见设计 doc §5） |
+| **准确度** | Single 100% 回归；Multi 依赖 `conversation_id` + 写锁；黄/Plan 不优于现版 |
+| **兼容** | 顶层 `state`/`sessionId` 保留；旧 VSIX 可读 v1 |
+
+### 2.3 实施前
+
+- [ ] Hook **Spike**：并行 2～3 Agent，验证 `conversation_id` / `sessionEnd`  
+- [ ] §8.1 Single 回归测试全过后再开 Multi UI  
+- [ ] 变更仅在 `scripts/lib/` + UI；**禁止**改坏 `products/cursor-extension/` 的 Single 路径语义
+
+**Phase 3.0～3.1 不做 Multi**；Mac v0.1.1 桌面/App 先稳定后再做。
 
 ---
 
@@ -193,6 +213,7 @@ App 本体（Tauri）不依赖用户单独安装 Node。
 | 文档 | 内容 |
 |------|------|
 | [HANDOFF.md](HANDOFF.md) | 阶段、待办、待决问题 |
+| [multi-agent-design.md](multi-agent-design.md) | **多 Agent 完整设计（Phase 3.x）** |
 | [traffic-lights-runtime.md](traffic-lights-runtime.md) | Hook / bridge 运行时 |
 | [architecture.md](architecture.md) | adapters 边界 |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期 Phase |

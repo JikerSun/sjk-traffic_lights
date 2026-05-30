@@ -4,7 +4,7 @@
 > **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
 > **分支：** `main`
 
-下次会话优先读：**本文 → [`desktop-app-status.md`](desktop-app-status.md)（桌面 App）→ [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`distribution.md`](distribution.md)**
+下次会话优先读：**本文 → [`desktop-app-status.md`](desktop-app-status.md)（桌面 App）→ [`multi-agent-design.md`](multi-agent-design.md)（若做 Multi Agent）→ [`traffic-lights-runtime.md`](traffic-lights-runtime.md) → [`distribution.md`](distribution.md)**
 
 ---
 
@@ -19,7 +19,7 @@
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
 | **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 单用户 · LAN/PWA 或 Tailscale/推送；见 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 黄灯 / Plan 红黄闪 | ⏸ 冻结 | Cursor Hook 信号不足 |
-| 多 Agent / Codex | 📋 后期 | 见 `desktop-app-requirements.md` |
+| 多 Agent / Codex | 📋 Phase 3.x | 计数 UI · [multi-agent-design.md](multi-agent-design.md) |
 
 **桌面 App 接续（功能 + 问题）：** [`docs/desktop-app-status.md`](desktop-app-status.md)
 
@@ -209,9 +209,10 @@ npm run bridge:watch                   # 可选
 
 **冻结 / 后期**
 
-6. **Phase 5 手机同步** — 📋 暂缓；需求与方案见 [mobile-sync-plan.md](mobile-sync-plan.md)（LAN PWA MVP → Tailscale/推送）  
-7. **Plan 灯** — 仅当用户要求 **「修 Plan 灯」** 再动 `scripts/lib/`  
-8. **Codex / 多 Agent** — 后期（[desktop-app-requirements.md](desktop-app-requirements.md)）
+6. **Phase 3.x 多 Agent** — Hook spike → `scripts/lib/` bridge v2 → Single 回归 → Multi UI；见 [multi-agent-design.md](multi-agent-design.md)  
+7. **Phase 5 手机同步** — 📋 暂缓；见 [mobile-sync-plan.md](mobile-sync-plan.md)  
+8. **Plan 灯** — 仅当用户要求 **「修 Plan 灯」** 再动 `scripts/lib/`  
+9. **Codex** — 后期（[desktop-app-requirements.md](desktop-app-requirements.md)）
 
 ---
 
@@ -242,6 +243,7 @@ npm run bridge:watch                   # 可选
 | [desktop-app-requirements.md](desktop-app-requirements.md) | 桌面 App 需求 + 多 Agent 备忘 |
 | [desktop-app-testing-mac.md](desktop-app-testing-mac.md) | Mac 桌面 App 测试步骤 |
 | [mobile-sync-plan.md](mobile-sync-plan.md) | **Phase 5 手机同步（暂缓）** |
+| [multi-agent-design.md](multi-agent-design.md) | **Phase 3.x 多 Agent 设计** |
 | [install/desktop/README.md](../install/desktop/README.md) | **Mac dmg 安装 / 发 Release / Windows 打 exe** |
 | [DEVELOPMENT_PLAN.md](../DEVELOPMENT_PLAN.md) | 长期计划、历史测试记录 §9–11 |
 | [README.md](../README.md) | 对外入口 |
@@ -266,6 +268,7 @@ npm run bridge:watch                   # 可选
 | 2026-05-29 | **fix workspace_roots** | 全局 Hook 灯不亮根因修复 |
 | 2026-05-29 | **v0.1.5 Release** | VSIX 打包含 `resources/image/`；README 安装/卸载完善 |
 | 2026-05-30 | **desktop-v0.1.1** | Finder 启动修复；安装文档 `xattr`；Mac 分发 pitfalls 文档 |
+| 2026-05-30 | **Phase 3.x 多 Agent 设计** | [multi-agent-design.md](multi-agent-design.md) 规格：Single 回归 + Multi 计数 + 性能/内存上界 |
 | 2026-05-30 | **Phase 5 立项暂缓** | 手机同步方案写入 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 2026-05-29 | **Phase 3.1 菜单栏** | 窗口/恢复吸附进菜单；浮窗去掉 ⌖；设置仅 Hook |
 | 2026-05-29 | **吸附改为触发式** | 取消跟窗 loop；仅启动/恢复吸附时读 bounds |

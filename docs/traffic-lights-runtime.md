@@ -106,6 +106,20 @@ Hooks run as **Node subprocess per event**. Minimize work:
 | v4.6 | `stop(completed)` → always DONE; plan scan only on `aborted` |
 | v4.7 | Slim hooks.json, no extension watcher/poll, no local logs |
 
+## Bridge v2 (multi-agent — not implemented)
+
+Planned extension to per-workspace `state.json`. **Full spec:** [multi-agent-design.md](multi-agent-design.md).
+
+| Topic | Rule |
+|-------|------|
+| Storage | **Single file overwrite** per workspace — no append log |
+| Single mode | `N_active ≤ 1` → **identical** to current v1 behavior; no badge digits |
+| Multi mode | Per-state counts on lit lights; prune `agents{}` with `T_done` / `T_stale` / `MAX_ACTIVE` |
+| Performance | Single fast path; skip write if `counts` unchanged; optional 50–80ms debounce |
+| Accuracy | Requires stable `conversation_id` + workspace file lock; yellow/plan limits unchanged |
+
+Until v2 ships, all UIs read top-level `state` only.
+
 ## Next product steps (see DEVELOPMENT_PLAN §10)
 
 1. **Windows VSIX validation** — same bridge paths on `%USERPROFILE%\.cursor\`.

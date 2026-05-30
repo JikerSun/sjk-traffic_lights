@@ -183,7 +183,8 @@ products/desktop-overlay/
 4. 内置 Node 打进 `resources/node/`
 5. 菜单 **Uninstall** 改为打开 Preferences 卸载弹窗（或同样步骤说明）
 6. Intel Mac x64 构建 / CI（GitHub Actions `macos-latest` + `windows-latest`）
-7. **Phase 5 手机同步** — 📋 暂缓，见 [mobile-sync-plan.md](mobile-sync-plan.md)
+7. **Phase 3.x 多 Agent** — 见 [multi-agent-design.md](multi-agent-design.md)（Single 回归门槛 + Spike）
+8. **Phase 5 手机同步** — 📋 暂缓，见 [mobile-sync-plan.md](mobile-sync-plan.md)
 
 ## 7. 发版检查清单（Mac dmg）
 
@@ -204,3 +205,4 @@ products/desktop-overlay/
 | [install/desktop/README.md](../install/desktop/README.md) | **dmg 下载 / 安装 / Windows 打 exe** |
 | [distribution.md](distribution.md) | 全产品分发总览 |
 | [mobile-sync-plan.md](mobile-sync-plan.md) | Phase 5 手机同步（暂缓） |
+| [multi-agent-design.md](multi-agent-design.md) | Phase 3.x 多 Agent 设计 |
