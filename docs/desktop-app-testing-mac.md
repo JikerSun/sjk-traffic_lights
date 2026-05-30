@@ -44,6 +44,8 @@ npm run dev:desktop
 1. 同步 Hook 脚本到 `src-tauri/resources/hook-kit/`
 2. 启动 Tauri 开发模式（设置窗口 + 浮窗）
 
+**Multi Agent（v0.1.6+）：** 浮窗与侧边栏同读 `displayMode` + `counts`；测前确保 `npm run install:global-hooks` 为最新。
+
 **首次启动：**
 
 - App 会自动安装 **Cursor 全局 Hook**（等同以前的 `install:global-hooks`）

@@ -96,20 +96,51 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         width: 100%;
         height: 100%;
       }
-      .light {
+      .light-wrap {
         position: absolute;
         width: 48.6px;
         height: 48.6px;
         left: 5.94px;
       }
-      #red {
+      .light {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #redWrap {
         top: 10.26px;
       }
-      #yellow {
+      #yellowWrap {
         top: 56.43px;
       }
-      #green {
+      #greenWrap {
         top: 102.6px;
+      }
+      .badge {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1;
+        pointer-events: none;
+      }
+      .badge.visible {
+        display: flex;
+      }
+      .badge-red {
+        color: #ffd6d6;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.9);
+      }
+      .badge-yellow {
+        color: #5c4a00;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.55);
+      }
+      .badge-green {
+        color: #d7ffd7;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 2px rgba(0, 0, 0, 0.9);
       }
       .meta {
         margin-top: 6.48px;
@@ -125,9 +156,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   <body>
     <div class="panel">
       <img class="panel-bg" src="${panelBg}" alt="panel background" />
-      <img id="red" class="light" src="${redOff}" alt="red light" />
-      <img id="yellow" class="light" src="${yellowOff}" alt="yellow light" />
-      <img id="green" class="light" src="${greenOff}" alt="green light" />
+      <div id="redWrap" class="light-wrap">
+        <img id="red" class="light" src="${redOff}" alt="red light" />
+        <span id="redBadge" class="badge badge-red"></span>
+      </div>
+      <div id="yellowWrap" class="light-wrap">
+        <img id="yellow" class="light" src="${yellowOff}" alt="yellow light" />
+        <span id="yellowBadge" class="badge badge-yellow"></span>
+      </div>
+      <div id="greenWrap" class="light-wrap">
+        <img id="green" class="light" src="${greenOff}" alt="green light" />
+        <span id="greenBadge" class="badge badge-green"></span>
+      </div>
     </div>
     <div class="meta"><strong>State:</strong><span id="state">IDLE</span></div>
     <div class="meta"><strong>Reason:</strong><span id="reason">No event</span></div>
@@ -145,6 +185,20 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       const redEl = document.getElementById("red");
       const yellowEl = document.getElementById("yellow");
       const greenEl = document.getElementById("green");
+      const redBadgeEl = document.getElementById("redBadge");
+      const yellowBadgeEl = document.getElementById("yellowBadge");
+      const greenBadgeEl = document.getElementById("greenBadge");
+
+      function setBadge(el, text) {
+        if (!el) return;
+        if (text) {
+          el.textContent = text;
+          el.classList.add("visible");
+        } else {
+          el.textContent = "";
+          el.classList.remove("visible");
+        }
+      }
 
       window.addEventListener("message", (event) => {
         const msg = event.data;
@@ -154,6 +208,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         redEl.src = msg.render.redOn ? lightUrls.redOn : lightUrls.redOff;
         yellowEl.src = msg.render.yellowOn ? lightUrls.yellowOn : lightUrls.yellowOff;
         greenEl.src = msg.render.greenOn ? lightUrls.greenOn : lightUrls.greenOff;
+        setBadge(redBadgeEl, msg.render.redBadge || "");
+        setBadge(yellowBadgeEl, msg.render.yellowBadge || "");
+        setBadge(greenBadgeEl, msg.render.greenBadge || "");
       });
     </script>
   </body>

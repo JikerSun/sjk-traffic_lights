@@ -3,13 +3,13 @@
 在 Cursor 侧边栏用 **红 / 黄 / 绿** 三盏灯表示 Agent 状态：运行中、等待用户、已完成。
 
 **仓库：** https://github.com/JikerSun/sjk-traffic_lights  
-**当前稳定版：** [v0.1.5](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.5) · VSIX：`ai-traffic-lights-cursor.vsix`
+**当前稳定版：** [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) · VSIX：`ai-traffic-lights-cursor.vsix`（Multi Agent）
 
 ### 项目阶段
 
 | 阶段 | 状态 |
 |------|------|
-| Cursor 侧边栏插件（Mac） | ✅ v0.1.5 已可用（红 / 绿 / ERROR + 全局 Hook） |
+| Cursor 侧边栏插件（Mac） | ✅ **v0.1.6**（Multi Agent 计数 + Single 回归 + 全局 Hook） |
 | Cursor 侧边栏插件（Windows） | 🧪 待同事实测 VSIX（安装步骤与 Mac 相同） |
 | **桌面悬浮窗 App（Mac）** | ✅ **v0.1.1** — [下载 dmg](https://github.com/JikerSun/sjk-traffic_lights/releases) · [安装说明](install/desktop/README.md) |
 | 桌面悬浮窗 App（Windows） | 🔴 需 Windows 机构 `.exe`；窗口 API 未实现，见 [install/desktop/README.md](install/desktop/README.md) §C |
@@ -43,9 +43,11 @@ Cursor Agent 事件
 
 ### 步骤 1：安装侧边栏扩展（VSIX）
 
-1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`ai-traffic-lights-cursor.vsix`**（请用 **v0.1.5+**，旧版可能缺侧边栏图片）
-2. Cursor → 命令面板（Mac `Cmd+Shift+P` / Windows `Ctrl+Shift+P`）→ **Extensions: Install from VSIX...** → 选择该文件
-3. 若曾装过旧版：先在 **Extensions** 里卸载 **AI Traffic Lights**，再装新 VSIX
+1. 打开 **[Releases](https://github.com/JikerSun/sjk-traffic_lights/releases)**，下载 **`ai-traffic-lights-cursor.vsix`**（请用 **v0.1.6**；v0.1.5 无 Multi Agent）
+2. **若重装：** 先 `Cmd+Q` 完全退出 Cursor，再安装（避免 `Please restart VS Code before reinstalling`）
+3. Cursor → 命令面板（Mac `Cmd+Shift+P` / Windows `Ctrl+Shift+P`）→ **Extensions: Install from VSIX...** → 选择该文件  
+   或 Cursor 关闭时：`"/Applications/Cursor.app/Contents/Resources/app/bin/cursor" --install-extension /path/to.vsix`
+4. Reload Window
 
 ### 步骤 2：安装全局 Hooks
 
@@ -110,7 +112,7 @@ npm run uninstall:cursor-extension
 
 | 要卸什么 | 怎么做 |
 |----------|--------|
-| **扩展（VSIX）** | Cursor → **Extensions** → **AI Traffic Lights** → **Uninstall** → Reload |
+| **扩展（VSIX）** | Cursor → **Extensions** → **AI Traffic Lights** → **Uninstall** → Reload；或 Cursor 关闭时：`cursor --uninstall-extension local.ai-traffic-lights-cursor-extension`（Mac 完整路径见 [install/cursor/extension/README.md](install/cursor/extension/README.md)） |
 | **全局 Hooks** | 须 **clone 仓库** 后执行 `npm install && npm run uninstall:global-hooks`（同方式 A 第 1 步） |
 
 仅卸扩展、不卸 Hooks：侧边栏没了，但 Agent 仍可能触发 Hook 写文件（无 UI、几乎无性能影响）。要彻底干净请卸 Hooks。

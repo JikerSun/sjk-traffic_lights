@@ -1,7 +1,7 @@
 {
   "name": "ai-traffic-lights-cursor-extension",
   "displayName": "AI Traffic Lights",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "local",
   "description": "Traffic light status indicator for AI workflow in Cursor.",
   "categories": [

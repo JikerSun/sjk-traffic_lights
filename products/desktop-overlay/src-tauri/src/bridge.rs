@@ -6,13 +6,47 @@ use serde::{Deserialize, Serialize};
 use crate::config::{bridge_path_for_workspace, guess_workspace_from_title};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct BridgeCounts {
+    #[serde(default)]
+    pub running: u32,
+    #[serde(default)]
+    pub waiting: u32,
+    #[serde(default)]
+    pub done: u32,
+    #[serde(default)]
+    pub error: u32,
+    #[serde(default)]
+    pub plan: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct StateEvent {
+    #[serde(default = "default_tool")]
+    pub tool: String,
     pub state: String,
+    #[serde(rename = "sessionId", default = "default_session")]
+    pub session_id: String,
     pub reason: Option<String>,
     pub source: Option<String>,
     #[serde(rename = "workspaceRoot")]
     pub workspace_root: Option<String>,
+    #[serde(rename = "workspaceStateId")]
+    pub workspace_state_id: Option<String>,
     pub ts: u64,
+    #[serde(rename = "bridgeVersion", default)]
+    pub bridge_version: Option<u32>,
+    #[serde(rename = "displayMode", default)]
+    pub display_mode: Option<String>,
+    #[serde(default)]
+    pub counts: Option<BridgeCounts>,
+}
+
+fn default_tool() -> String {
+    "cursor".to_string()
+}
+
+fn default_session() -> String {
+    "cursor-session".to_string()
 }
 
 pub fn read_state(path: &PathBuf) -> Option<StateEvent> {

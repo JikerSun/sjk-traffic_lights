@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXT_SRC="$ROOT_DIR/products/cursor-extension"
 CURSOR_EXT_DIR="$HOME/.cursor/extensions"
-EXT_ID_DIR="local.ai-traffic-lights-cursor-extension-0.1.5"
+EXT_ID_DIR="local.ai-traffic-lights-cursor-extension-0.1.6"
 EXT_DST="$CURSOR_EXT_DIR/$EXT_ID_DIR"
 
 echo "[1/4] Copying image assets..."

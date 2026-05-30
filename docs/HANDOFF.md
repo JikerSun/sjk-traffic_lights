@@ -12,18 +12,18 @@
 
 | 里程碑 | 状态 | 说明 |
 |--------|------|------|
-| **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **告一段落** | v0.1.5 VSIX + 全局 Hook + GitHub Release；红 / 绿 / ERROR 实测 OK |
-| **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.5 + `install:global-hooks` |
+| **Phase 2 — Cursor 侧边栏（Mac）** | ✅ **v0.1.6 已发** | Multi Agent 计数 + Single 回归 · [v0.1.6](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6) |
+| **Phase 2 — Windows VSIX** | 🧪 **待测** | 同事按 README 装 v0.1.6 + `install:global-hooks` |
 | **Phase 3 — 桌面悬浮窗（Mac）** | ✅ **v0.1.1 可装可测** | Tauri · Setup · [desktop-v0.1.1](https://github.com/JikerSun/sjk-traffic_lights/releases/tag/desktop-v0.1.1) |
 | **Phase 3.1 — 菜单 + Preferences** | ✅ | Settings 子菜单（运行期切换）；Preferences 卸载步骤弹窗 |
 | **Phase 3 — Windows 桌面** | 🔴 **未就绪** | `platform_windows.rs` stub；需在 Windows 上 build exe |
 | **Phase 5 — 手机同步红绿灯** | 📋 **暂缓** | 单用户 · LAN/PWA 或 Tailscale/推送；见 [mobile-sync-plan.md](mobile-sync-plan.md) |
 | 黄灯 / Plan 红黄闪 | ⏸ 冻结 | Cursor Hook 信号不足 |
-| 多 Agent / Codex | 📋 Phase 3.x | 计数 UI · [multi-agent-design.md](multi-agent-design.md) |
+| 多 Agent / Codex | ✅ **v0.1.6 已实施** | Hook + 扩展 + 桌面 overlay · [multi-agent-design.md](multi-agent-design.md) |
 
 **桌面 App 接续（功能 + 问题）：** [`docs/desktop-app-status.md`](desktop-app-status.md)
 
-**扩展稳定版（冻结）：** **0.1.5** · https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.5
+**扩展稳定版：** **0.1.6** · https://github.com/JikerSun/sjk-traffic_lights/releases/tag/v0.1.6
 
 **桌面包：** 标签 `desktop-v0.1.1` · 构建 / 发版 pitfalls 见 [`desktop-app-status.md`](desktop-app-status.md) **§3、§7** · 用户安装见 [install/desktop/README.md](../install/desktop/README.md)
 
@@ -42,7 +42,7 @@
 | `WAITING_PLAN_BUILD` | 红黄交替 | ⚠️ Plan 阶段 Hook 难 latch，多数仍红灯 |
 | `IDLE` | 全灭 | ✅ |
 
-扩展版本：**0.1.5**（`products/cursor-extension/package.json`）  
+扩展版本：**0.1.6**（`products/cursor-extension/package.json`）  
 UI 面板相对设计稿约 **54%**（75%×80%×90%，见 `sidebarProvider.ts` / `desktop-overlay/index.html`）。
 
 ---

@@ -1,6 +1,6 @@
 # 多 Agent 状态检测与计数 UI — 设计规格
 
-> **状态：** 📋 **已立项，未实施**（2026-05-30）  
+> **状态：** ✅ **已实施**（2026-05-30，扩展 **v0.1.6** + 全局 Hook + 桌面 overlay 同 core）  
 > **优先级：** Phase 3.x（Mac 桌面 v0.1.1 之后）· 在 **单 Agent 行为零回归** 前提下开发  
 > **接续：** [HANDOFF.md](HANDOFF.md) §0 · [desktop-app-requirements.md](desktop-app-requirements.md) §2 · [traffic-lights-runtime.md](traffic-lights-runtime.md)
 
@@ -44,13 +44,20 @@ Agent 由 Hook payload 的 **`conversation_id`**（或 `session_id`）标识。
 
 - Cursor 侧边栏里 **无 Hook 的历史会话**（用户「这次不用」的那些）— **不会** 被枚举或预加载。
 
-### 2.2 展示模式
+### 2.2 展示模式（实现补充）
+
+设计稿用 `N_active = |Active Set|`；**v0.1.6 实现**改为按 **working / 波次** 判定，避免「4 DONE + 1 新 RUNNING」仍显示 Multi：
+
+| 条件 | displayMode |
+|------|-------------|
+| ≥2 个 **working**（RUNNING / WAITING / ERROR / PLAN） | `multi` |
+| 仅 DONE≥2、无 working（同一波刚结束） | `multi`（如绿 4） |
+| 1 working + 旧 DONE，且新 Agent `runningSince` 晚于全部 `doneAt` | `single`（清旧 DONE，无 badge） |
+| 其余 | `single` |
 
 ```
-N_active = |Active Set|
-
-N_active <= 1  →  displayMode = "single"   // 现版行为
-N_active >= 2  →  displayMode = "multi"     // 分状态计数 + 数字
+N_active <= 1  →  displayMode = "single"   // 现版行为（文档原意）
+N_active >= 2  →  displayMode = "multi"     // 见上表 working/波次规则
 ```
 
 **可选（实现阶段）：** Multi → Single 切换加 **3～5s 滞后**，避免宽限边界抖动。

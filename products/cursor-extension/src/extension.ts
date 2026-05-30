@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { watch as fsWatch } from "node:fs";
-import { TrafficLightEngine, type AiState, type StateEvent } from "./trafficLightCore.js";
+import { TrafficLightEngine, type AiState, type BridgeDocument, type StateEvent } from "./trafficLightCore.js";
 import { SidebarProvider } from "./sidebarProvider.js";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
@@ -124,21 +124,27 @@ async function writeBridgeEvent(uri: vscode.Uri, event: StateEvent): Promise<voi
 }
 
 async function applyBridgeFile(uri: vscode.Uri): Promise<void> {
-  const parsed = await readBridgeEvent(uri);
+  const parsed = await readBridgeDocument(uri);
   if (parsed) {
-    engine.consume(parsed);
+    engine.consumeBridge(parsed);
   }
 }
 
-async function readBridgeEvent(uri: vscode.Uri): Promise<StateEvent | undefined> {
+async function readBridgeDocument(uri: vscode.Uri): Promise<BridgeDocument | undefined> {
   try {
     const raw = await readFile(uri.fsPath, "utf8");
-    const parsed = JSON.parse(raw) as StateEvent;
-    if (!parsed?.state || !parsed?.tool || !parsed?.sessionId || !parsed?.ts) {
+    const parsed = JSON.parse(raw) as BridgeDocument;
+    if (!parsed?.state || !parsed?.ts) {
       return undefined;
     }
     if (!VALID_STATES.has(parsed.state)) {
       return undefined;
+    }
+    if (!parsed.tool) {
+      parsed.tool = "cursor";
+    }
+    if (!parsed.sessionId) {
+      parsed.sessionId = "cursor-session";
     }
     return parsed;
   } catch {

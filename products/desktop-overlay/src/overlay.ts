@@ -1,5 +1,5 @@
 import { TrafficLightEngine } from "@traffic-lights/core";
-import type { AiState, StateEvent } from "@traffic-lights/protocol";
+import type { BridgeDocument, LightRenderState } from "@traffic-lights/protocol";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -18,35 +18,54 @@ const overlayWin = getCurrentWindow();
 const redEl = document.getElementById("red") as HTMLImageElement;
 const yellowEl = document.getElementById("yellow") as HTMLImageElement;
 const greenEl = document.getElementById("green") as HTMLImageElement;
+const redBadgeEl = document.getElementById("redBadge") as HTMLSpanElement;
+const yellowBadgeEl = document.getElementById("yellowBadge") as HTMLSpanElement;
+const greenBadgeEl = document.getElementById("greenBadge") as HTMLSpanElement;
 const panelBgEl = document.getElementById("panelBg") as HTMLImageElement;
 const overlayRoot = document.getElementById("overlay") as HTMLDivElement;
 
 panelBgEl.src = panelBg;
 
-function render(): void {
-  const renderState = engine.getRenderState();
+function setBadge(el: HTMLSpanElement, text?: string): void {
+  if (text) {
+    el.textContent = text;
+    el.classList.add("visible");
+  } else {
+    el.textContent = "";
+    el.classList.remove("visible");
+  }
+}
+
+function renderFromState(renderState: LightRenderState): void {
   redEl.src = renderState.redOn ? redOn : redOff;
   yellowEl.src = renderState.yellowOn ? yellowOn : yellowOff;
   greenEl.src = renderState.greenOn ? greenOn : greenOff;
+  setBadge(redBadgeEl, renderState.redBadge);
+  setBadge(yellowBadgeEl, renderState.yellowBadge);
+  setBadge(greenBadgeEl, renderState.greenBadge);
 }
 
-function consume(event: StateEvent): void {
-  engine.consume(event);
+function render(): void {
+  renderFromState(engine.getRenderState());
+}
+
+function consumeBridge(doc: BridgeDocument): void {
+  engine.consumeBridge(doc);
   render();
 }
 
 engine.subscribe(() => render());
 setInterval(render, 350);
 
-void invoke<StateEvent | null>("get_bridge_state").then((event) => {
-  if (event?.state) {
-    consume(event as StateEvent);
+void invoke<BridgeDocument | null>("get_bridge_state").then((doc) => {
+  if (doc?.state) {
+    consumeBridge(doc);
   }
 });
 
-void listen<StateEvent>("bridge-state", (payload) => {
+void listen<BridgeDocument>("bridge-state", (payload) => {
   if (payload.payload?.state) {
-    consume(payload.payload);
+    consumeBridge(payload.payload);
   }
 });
 

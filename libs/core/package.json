@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test test/*.test.mjs"
+    "test": "npm run build && node --test test/*.test.mjs && node --test ../../scripts/test/*.test.mjs"
   },
   "dependencies": {
     "@traffic-lights/protocol": "file:../protocol"

@@ -41,6 +41,7 @@ import {
   getWorkspaceStateId,
   resolveProjectRootFromHook
 } from "../../scripts/lib/bridge-paths.mjs";
+import { commitBridgeUpdate } from "../../scripts/lib/commit-bridge.mjs";
 
 const DEBUG = process.env.TRAFFIC_LIGHTS_DEBUG === "1";
 const eventName = process.argv[2] || "unknown";
@@ -109,20 +110,6 @@ async function readHookPayload() {
   const fromEnv = parseHookPayload(process.env.HOOK_INPUT);
   const fromStdin = parseHookPayload(await readStdin());
   return { ...fromEnv, ...fromStdin };
-}
-
-async function writeBridge(payload) {
-  const body = JSON.stringify(
-    { ...payload, workspaceStateId, workspaceRoot: projectRoot },
-    null,
-    2
-  );
-  await mkdir(dirname(bridgePath), { recursive: true });
-  await writeFile(bridgePath, body, "utf8");
-  if (mirrorOverlay) {
-    await mkdir(dirname(overlayBridgePath), { recursive: true });
-    await writeFile(overlayBridgePath, body, "utf8");
-  }
 }
 
 async function getPreviousState() {
@@ -316,13 +303,20 @@ async function main() {
     if (conversationId) {
       await writeWatcherCursor(projectRoot, { conversationId, lastAskIdx: askIdx, initialized: true, ts: now });
     }
-    await writeBridge({
-      tool: "cursor",
-      sessionId: conversationId || "cursor-session",
-      state: "RUNNING",
-      reason: "New user prompt",
-      source: "cursor-hook:beforeSubmitPrompt",
-      ts: now
+    await commitBridgeUpdate({
+      bridgePath,
+      overlayBridgePath,
+      mirrorOverlay,
+      workspaceStateId,
+      projectRoot,
+      hookPayload,
+      mapped: {
+        state: "RUNNING",
+        reason: "New user prompt",
+        source: "cursor-hook:beforeSubmitPrompt"
+      },
+      eventName,
+      forceWrite: true
     });
     await writeActiveSession(hookPayload, "RUNNING");
     process.stdout.write(JSON.stringify({ continue: true }));
@@ -333,13 +327,16 @@ async function main() {
     await clearAskLatch(projectRoot);
     await clearSessionTurn(projectRoot);
     const mapped = resolveBridgeState({ eventName, payload: hookPayload, rows, sessionTurn, plan, toolName, phase });
-    await writeBridge({
-      tool: "cursor",
-      sessionId: conversationId || "cursor-session",
-      state: mapped.state,
-      reason: mapped.reason,
-      source: mapped.source,
-      ts: Date.now()
+    await commitBridgeUpdate({
+      bridgePath,
+      overlayBridgePath,
+      mirrorOverlay,
+      workspaceStateId,
+      projectRoot,
+      hookPayload,
+      mapped,
+      eventName,
+      forceWrite: true
     });
     return;
   }
@@ -437,15 +434,20 @@ async function main() {
     mapped.state === "WAITING_USER" &&
     (eventName === "stop" || stillChoosing || mapped.source?.includes("transcript"));
 
-  if (shouldWrite || mapped.state !== previousState || forceYellowWrite) {
-    await writeBridge({
-      tool: "cursor",
-      sessionId: conversationId || "cursor-session",
-      state: mapped.state,
-      reason: mapped.reason,
-      source: mapped.source,
-      ts: Date.now()
-    });
+  const allowSingleWrite = shouldWrite || mapped.state !== previousState || forceYellowWrite;
+  const { wrote } = await commitBridgeUpdate({
+    bridgePath,
+    overlayBridgePath,
+    mirrorOverlay,
+    workspaceStateId,
+    projectRoot,
+    hookPayload,
+    mapped,
+    eventName,
+    forceWrite: forceYellowWrite,
+    allowSingleWrite
+  });
+  if (wrote) {
     await writeActiveSession(hookPayload, mapped.state);
     if (DEBUG) {
       process.stderr.write(`[bridge] ${previousState} -> ${mapped.state} (${eventName})\n`);

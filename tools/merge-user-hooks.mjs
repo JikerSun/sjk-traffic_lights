@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { copyFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -90,12 +91,27 @@ async function copyTree(srcDir, destDir) {
   }
 }
 
+function resolveHookSource(kitRoot) {
+  const candidates = [
+    resolve(kitRoot, ".cursor", "hooks", "write-bridge-from-hook.mjs"),
+    resolve(kitRoot, "hooks", "write-bridge-from-hook.mjs")
+  ];
+  for (const path of candidates) {
+    if (existsSync(path)) {
+      return path;
+    }
+  }
+  throw new Error(
+    `Hook script not found. Tried:\n${candidates.map((p) => `  - ${p}`).join("\n")}`
+  );
+}
+
 export async function installGlobalHooks(options = {}) {
   const kitRoot = options.kitRoot ?? getKitRoot();
   const nodePath = options.nodePath ?? process.env.AI_TL_NODE ?? process.execPath;
   const hookScriptPath = resolve(GLOBAL_ROOT, "hooks", "write-bridge-from-hook.mjs");
   const libSrc = resolve(kitRoot, "scripts", "lib");
-  const hookSrc = resolve(kitRoot, "hooks", "write-bridge-from-hook.mjs");
+  const hookSrc = resolveHookSource(kitRoot);
 
   await mkdir(dirname(USER_HOOKS_JSON), { recursive: true });
   await copyTree(libSrc, resolve(GLOBAL_ROOT, "lib"));
